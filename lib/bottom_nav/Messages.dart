@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:chat_app_with_myysql/Contacts.dart';
 import 'package:chat_app_with_myysql/Models/OnetoOneChatRoomModel.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/OneToOneChat.dart';
+import 'package:chat_app_with_myysql/one_to_one_chat/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/helper/MyPraf.dart';
 import 'package:chat_app_with_myysql/helper/apis/ApiService.dart';
 import 'package:chat_app_with_myysql/helper/apis/SocketManager.dart';
@@ -12,6 +12,7 @@ import 'package:chat_app_with_myysql/helper/methods.dart';
 import 'package:chat_app_with_myysql/helper/myColors.dart';
 import 'package:chat_app_with_myysql/helper/widgets/myText.dart';
 import 'package:chat_app_with_myysql/helper/widgets/my_profile_container.dart';
+import 'package:chat_app_with_myysql/one_to_one_chat/controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -87,6 +88,11 @@ class _MessagesState extends State<Messages> {
                 child: InkWell(
 
                   onTap: () {
+
+                    ChatController chatController = Get.put(ChatController());
+                    chatController.fetchChat(model.user_model.id);
+                    chatController.senderUser=user_model!;
+                    chatController.receiverUser=model.user_model;
                     next_page(OneToOneChat(chatID: model.chatID, sender: user_model!, receiver: model.user_model));
                   },
                   child: Row(children: [
@@ -136,7 +142,7 @@ class _MessagesState extends State<Messages> {
   fetchRooms()async{
 
     Response response=await apiService.getApiWithToken(fetch1To1chatRooms);
-    // print(response.body.toString());
+     print(response.body.toString());
     // // [{_id: 65a65648ffdcd322af8fd0fd,
     // // users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, avatar: https://i.stack.imgur.com/34AD2.jpg, username: n10}],
     // // latestMessages: [], isGroupChat: false, createdAt: 2024-01-16T10:11:20.266Z, updatedAt: 2024-01-18T10:32:14.131Z, __v: 0,
@@ -161,6 +167,7 @@ class _MessagesState extends State<Messages> {
 
       List<dynamic> users=element['users'];
       User_model user_model=User_model.fromJson(users[0]);
+
 
       OnetoOneChatRoomModel model=OnetoOneChatRoomModel(chatID: chatID, time: time, msg: msg, user_model: user_model);
       chatRoomsModels.add(model);
