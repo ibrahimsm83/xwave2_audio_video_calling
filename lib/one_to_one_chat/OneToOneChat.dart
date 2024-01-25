@@ -105,25 +105,10 @@ class _OneToOneChatState extends State<OneToOneChat> {
             ChatModel model=chatController.chatList[index];
 // print(model.sender.id);
             if(model.sender.id==widget.sender.id) {
-              // print(model.sender.id);
-              // print(widget.sender.id);
+
               return Align(
                   alignment: Alignment.centerRight,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      chatHolder(model: model, chatBoxColor: appYellow),
-                      // Container(
-                      //   margin: EdgeInsets.only(right: 5.0),
-                      //   height: 200,
-                      //   width: 250,
-                      //   color: Colors.red,
-                      //   child: Image.network('https://static.pakwheels.com/2022/09/Ferrari-Purosangue-revealed-11-scaled.jpg',fit: BoxFit.fill,),
-                      //
-                      // ),
-
-                    ],
-                  ));
+                  child: chatHolder(model: model, chatBoxColor: appYellow));
             }
             else{
               return Align(
@@ -139,12 +124,18 @@ class _OneToOneChatState extends State<OneToOneChat> {
   Widget chatOptionsWight(){
     return Row(children: [
       IconButton(onPressed: () {
-        
-      }, icon: Icon(Icons.emoji_emotions_outlined)),
+      }, icon: const Icon(Icons.emoji_emotions_outlined)),
       chatInputWight(),
-      IconButton(onPressed: () {
-         chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver);
-      }, icon: Icon(Icons.send,color: appYellow,))
+      Visibility(
+        visible: !chatController.isLoading.value,
+        replacement: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(color: appYellow,),
+        ),
+        child: IconButton(onPressed: () {
+           chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver);
+        }, icon: Icon(Icons.send,color: appYellow,)),
+      )
     ],);
   }
 
@@ -167,9 +158,14 @@ class _OneToOneChatState extends State<OneToOneChat> {
             padding: const EdgeInsets.all(2.0),
             child: Icon(Icons.attach_file),
           ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Icon(Icons.camera_alt_outlined),
+          InkWell(
+            onTap: (){
+              chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isImage: true);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Icon(Icons.camera_alt_outlined),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(2.0),
