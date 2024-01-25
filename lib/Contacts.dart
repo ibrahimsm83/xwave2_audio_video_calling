@@ -3,13 +3,14 @@ import 'dart:io';
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/OneToOneChat.dart';
+import 'package:chat_app_with_myysql/one_to_one_chat/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/helper/MyPraf.dart';
 import 'package:chat_app_with_myysql/helper/apis/ApiService.dart';
 import 'package:chat_app_with_myysql/helper/apis/apis.dart';
 import 'package:chat_app_with_myysql/helper/methods.dart';
 import 'package:chat_app_with_myysql/helper/myColors.dart';
 import 'package:chat_app_with_myysql/helper/widgets/myText.dart';
+import 'package:chat_app_with_myysql/one_to_one_chat/controller.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -134,7 +135,12 @@ class _ContactsState extends State<Contacts> {
       String chatId=response.body['chat']['_id'];
       List<dynamic> responseUsersList=response.body['chat']['users'];
       List<User_model> users=responseUsersList.map((e) => User_model.fromJson(e)).toList();
-
+      print("-------contacts---1-");
+      ChatController chatController = Get.put(ChatController());
+      chatController.senderUser=users[0];
+      chatController.receiverUser=users[1];
+      chatController.fetchChat(users[1].id);
+      print("-------contacts---2-");
       close_current_go_next_page(OneToOneChat(chatID: chatId, sender: users[0], receiver: users[1]));
 
     }
