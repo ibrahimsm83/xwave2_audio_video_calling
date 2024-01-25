@@ -21,9 +21,9 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import 'OnetoOneCall/MakingAudioCall.dart';
-import 'helper/apis/apis.dart';
-import 'helper/widgets/ChatHolder.dart';
+import 'MakingAudioCall.dart';
+import '../helper/apis/apis.dart';
+import '../helper/widgets/ChatHolder.dart';
 
 class OneToOneChat extends StatefulWidget {
   final String chatID;

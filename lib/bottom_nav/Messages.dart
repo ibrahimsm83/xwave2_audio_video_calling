@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:chat_app_with_myysql/Contacts.dart';
+import 'package:chat_app_with_myysql/Contacts/Contacts.dart';
 import 'package:chat_app_with_myysql/Models/OnetoOneChatRoomModel.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/OneToOneChat.dart';
+import 'package:chat_app_with_myysql/OnetoOneCall/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/helper/MyPraf.dart';
 import 'package:chat_app_with_myysql/helper/apis/ApiService.dart';
 import 'package:chat_app_with_myysql/helper/apis/SocketManager.dart';
