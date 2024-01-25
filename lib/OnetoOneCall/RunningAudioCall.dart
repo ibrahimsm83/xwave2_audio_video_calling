@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:socket_io_client/socket_io_client.dart 'as IO;
+// import 'package:socket_io_client/socket_io_client.dart 'as IO;
 
 import '../helper/apis/apis.dart';
 
