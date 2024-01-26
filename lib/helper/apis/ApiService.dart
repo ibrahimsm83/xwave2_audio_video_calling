@@ -24,7 +24,7 @@ class ApiService extends GetConnect{
 
   postApiWithBody(String api,Map<String,dynamic> body)async{
     final response= await post(api, body,);
-    print("--ApiServices Response----${response}");
+    print("--ApiServices Response-postApiWithBody---${response}");
     if(response.status.hasError){
       return Future.error(response.statusText!);
     }else{
@@ -37,13 +37,12 @@ class ApiService extends GetConnect{
   postApiWithFromDataAndHeaderAndContantType(String api,Map<String,dynamic> body)async{
     String header=await getToken_praf();
     final response= await post(api, FormData(body), headers: {'Authorization': 'Bearer $header'},contentType: 'multipart/form-data');
-   print("--ApiServices Response----${response}");
+   print("--ApiServices Response--postApiWithFromDataAndHeaderAndContantType --${response}");
     if(response.status.hasError){
       return Future.error(response.statusText!);
     }else{
       return response;
     }
-
   }
 
 

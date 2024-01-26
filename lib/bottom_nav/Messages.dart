@@ -37,11 +37,8 @@ class _MessagesState extends State<Messages> {
       floatingActionButton: flottingBtn(),
       body: SafeArea(
         child: Column(children: [
-
           header(),
           chatRoomContainer(),
-
-
 
         ],),
       ),

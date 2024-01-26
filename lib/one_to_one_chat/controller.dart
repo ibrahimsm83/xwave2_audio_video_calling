@@ -1,7 +1,5 @@
 
-
 import 'dart:io';
-
 import 'package:chat_app_with_myysql/Models/ChatModel.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
 import 'package:chat_app_with_myysql/helper/apis/ApiService.dart';
@@ -15,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 class ChatController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isMessageLoading = false.obs;
+  RxBool isMicTapped = false.obs;
   ScrollController scrollController = ScrollController();
   TextEditingController messageController = TextEditingController();
   ApiService apiService = ApiService();
