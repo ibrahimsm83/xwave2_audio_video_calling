@@ -54,6 +54,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
    PlayerState playerState = PlayerState.stopped;
    Duration _duration = Duration();
    Duration _position = Duration();
+   String? _voicePat;
    bool _isPlaying = false;
 
    @override
@@ -65,6 +66,8 @@ class _OneToOneChatState extends State<OneToOneChat> {
        });
        print("listner-----onDurationChanged-");
      });
+
+
      // Set up listeners for player state changes
      audioPlayer.onPlayerStateChanged.listen((state) {
        setState(() {
@@ -75,15 +78,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
      audioPlayer.onPositionChanged.listen((Duration position) {
        setState(() {
          _position = position;
-         // print(_position.inMilliseconds);
-         // print(_duration.inMilliseconds);
-         // if(_position.inMilliseconds==_duration.inMilliseconds){
-         //   if(_isPlaying){
-         //     _isPlaying=false;
-         //   }
-         //
-         //
-         // }
+
        });
        print("listner-----onPositionChanged-");
      });
@@ -94,6 +89,9 @@ class _OneToOneChatState extends State<OneToOneChat> {
      _init();
      //fetchChat();
    }
+
+
+
 
    _init() async {
      try {
@@ -119,7 +117,9 @@ class _OneToOneChatState extends State<OneToOneChat> {
          // after initialization
          var current = await _recorder?.current(channel: 0);
          print("-------recorder initilized...");
-         print(current);
+         print("-------Custom path--...$customPath");
+         print("-------current path--...$current");
+
          // should be "Initialized", if all working fine
          setState(() {
            _current = current;
@@ -142,48 +142,48 @@ class _OneToOneChatState extends State<OneToOneChat> {
         Column(children: [
           myappBar(),
           //--------------------Audio recording Start-------
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                switch (_currentStatus) {
-                  case RecordingStatus.Initialized:
-                    {
-                      _start();
-                      break;
-                    }
-                  case RecordingStatus.Recording:
-                    {
-                      _pause();
-                      break;
-                    }
-                  case RecordingStatus.Paused:
-                    {
-                      _resume();
-                      break;
-                    }
-                  case RecordingStatus.Stopped:
-                    {
-                      _init();
-                      break;
-                    }
-                  default:
-                    break;
-                }
-              },
-              child: _buildText(_currentStatus),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _currentStatus != RecordingStatus.Unset ? _stop : null,
-            child: Text("Stop", style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent.withOpacity(0.5),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       switch (_currentStatus) {
+          //         case RecordingStatus.Initialized:
+          //           {
+          //             _start();
+          //             break;
+          //           }
+          //         case RecordingStatus.Recording:
+          //           {
+          //             _pause();
+          //             break;
+          //           }
+          //         case RecordingStatus.Paused:
+          //           {
+          //             _resume();
+          //             break;
+          //           }
+          //         case RecordingStatus.Stopped:
+          //           {
+          //             _init();
+          //             break;
+          //           }
+          //         default:
+          //           break;
+          //       }
+          //     },
+          //     child: _buildText(_currentStatus),
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.red,
+          //     ),
+          //   ),
+          // ),
+          // ElevatedButton(
+          //   onPressed: _currentStatus != RecordingStatus.Unset ? _stop : null,
+          //   child: Text("Stop", style: TextStyle(color: Colors.white)),
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: Colors.blueAccent.withOpacity(0.5),
+          //   ),
+          // ),
          const SizedBox(width: 8),
           ElevatedButton(
             onPressed: _audioPlayerStart,
@@ -203,24 +203,29 @@ class _OneToOneChatState extends State<OneToOneChat> {
               ),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: Icon(_isPlaying ||_currentStatus==RecordingStatus.Stopped ? Icons.pause : Icons.play_arrow),
-                    onPressed: () {
-                      _isPlaying ? _pause() : _play();
-                    },
-                  ),
+                  if (playerState == PlayerState.playing)
+                    IconButton(
+                      onPressed: () => _pause(),
+                      icon: Icon(Icons.pause),
+                    )
+                  else
+                    IconButton(
+                      onPressed: () =>_play(),
+                      icon:Icon(Icons.play_arrow),
+                    ),
+                  SizedBox(height: 20),
+
                   Flexible(
                     child: Slider(
                       value:
-                          //_current!.duration!.inMilliseconds.toDouble(),
                           _position.inMilliseconds.toDouble(),
                       onChanged: (double value) {
                         _seekTo(value);
-                        print(value);
+
                       },
                       min: 0.0,
                       max:
-                          //_current!.duration!.inMilliseconds.toDouble()
+
                           _duration.inMilliseconds.toDouble(),
                     ),
                   ),
@@ -232,11 +237,11 @@ class _OneToOneChatState extends State<OneToOneChat> {
           new Text("Status : $_currentStatus"),
           new Text('Avg Power: ${_current?.metering?.averagePower}'),
           new Text('Peak Power: ${_current?.metering?.peakPower}'),
-          new Text("File path of the record: ${_current?.path}"),
-          new Text("Format: ${_current?.audioFormat}"),
-          new Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
-          new Text("Extension : ${_current?.extension}"),
-          new Text("Audio recording duration : ${_current?.duration.toString()}"),
+          // new Text("File path of the record: ${_current?.path}"),
+          // new Text("Format: ${_current?.audioFormat}"),
+          // new Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
+          // new Text("Extension : ${_current?.extension}"),
+          // new Text("Audio recording duration : ${_current?.duration.toString()}"),
           //--------------------Audio recording end
           chatListWight(),
           Visibility(
@@ -342,10 +347,39 @@ class _OneToOneChatState extends State<OneToOneChat> {
           padding: const EdgeInsets.all(8.0),
           child: CircularProgressIndicator(color: appYellow,),
         ),
-        child: IconButton(onPressed: () {
-           //chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver);
-         // con.isMicTapped.value=false;
-        }, icon: Icon(Icons.send,color: appYellow,)),
+        child: IconButton(onPressed:()async {
+                if (_currentStatus != RecordingStatus.Unset) {
+                  // _stop();
+                  var result = await _recorder?.stop();
+                  print("----------current path --1");
+                  print(result?.path);
+                  print("----------current path --2");
+                  chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isVoice: true,voiceFile: result?.path);
+                } else {
+                  null;
+                }
+
+    },
+
+        //     () {
+        //    //chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver);
+        //  // con.isMicTapped.value=false;
+        //   print("-----button tapped--------1");
+        //
+        //    if(_currentStatus == RecordingStatus.Recording){
+        //      print("-----button tapped------2");
+        //      _stop;
+        //    }
+        //  //  if(_currentStatus != RecordingStatus.Unset){
+        //  //
+        //  //  _stop;
+        //  // // _audioPlayerStart();
+        //  //  }
+        // //  _currentStatus
+        //   //
+        // }
+
+         icon: Icon(Icons.send,color: appYellow,)),
       )
     ],);
   }
@@ -380,7 +414,16 @@ class _OneToOneChatState extends State<OneToOneChat> {
           InkWell(
             onTap: (){
               print("mic button tapped..");
-              chatController.isMicTapped.value=true;
+              if(_currentStatus == RecordingStatus.Initialized){
+                _start();
+                chatController.isMicTapped.value=true;
+              }else if(_currentStatus == RecordingStatus.Stopped){
+                _init();
+
+              }else{
+                _start();
+                chatController.isMicTapped.value=true;
+              }
     },
             child: Padding(
               padding: const EdgeInsets.all(2.0),
@@ -418,6 +461,14 @@ class _OneToOneChatState extends State<OneToOneChat> {
                onTap: (){
                  print("mic button tapped..");
                  chatController.isMicTapped.value=false;
+                 // if(_currentStatus == RecordingStatus.Recording){
+                 //   print("-------resume called");
+                 //   _resume();
+                 // }else if(_currentStatus == RecordingStatus.Paused){
+                 //   print("-------resume paused now start");
+                 //
+                 //   _start();
+                 // }
                },
                child: Padding(
                  padding: const EdgeInsets.all(8.0),
@@ -443,8 +494,6 @@ class _OneToOneChatState extends State<OneToOneChat> {
     String token=await getToken_praf();
     print('token - $token');
   }
-
-
    _start() async {
      try {
        await _recorder?.start();
@@ -470,24 +519,13 @@ class _OneToOneChatState extends State<OneToOneChat> {
        print(e);
      }
    }
-
    _resume() async {
      await _recorder?.resume();
      setState(() {});
    }
-
    _pause() async {
      await _recorder?.pause();
      setState(() {});
-   }
-
-   // Call to pause and resume audio
-   _audioPlayerPlayPause(bool play) async {
-     if(play){
-       await audioPlayer.resume();
-     } else {
-       await audioPlayer.pause();
-     }
    }
    _stop() async {
      var result = await _recorder?.stop();
@@ -496,26 +534,21 @@ class _OneToOneChatState extends State<OneToOneChat> {
     // File file = widget.localFileSystem.file(result?.path);
      //File file =LocalFileSystem().file(result?.path);
     // print("File length: ${await file.length()}");
+     chatController.isMicTapped.value=false;
      setState(() {
        _current = result;
+       _voicePat=result?.path;
        _currentStatus = _current!.status!;
        _isPlaying = false;
+
      });
    }
-
-   // Future<void> onPlayAudio() async {
-   //   Source source = DeviceFileSource(_current!.path!);
-   //  await audioPlayer.play(source);
-   // }
-
 
    // Call to play audio from the beginning
    _audioPlayerStart() async {
      Source source = DeviceFileSource(_current!.path!);
      await audioPlayer.play(source);
-     // if (result == 1) {
-     //   // success
-     // }
+
    }
 
 
@@ -558,6 +591,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
    @override
   void dispose() {
     unregisterEvent('new-message');
+    audioPlayer.dispose();
     super.dispose();
   }
 }

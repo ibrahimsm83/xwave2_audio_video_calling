@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:chat_app_with_myysql/Models/ChatModel.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
+import 'package:chat_app_with_myysql/helper/MyPraf.dart';
 import 'package:chat_app_with_myysql/helper/apis/ApiService.dart';
 import 'package:chat_app_with_myysql/helper/apis/apis.dart';
 import 'package:chat_app_with_myysql/helper/methods.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class ChatController extends GetxController {
   RxBool isLoading = false.obs;
@@ -96,28 +98,108 @@ class ChatController extends GetxController {
   }
 
   sendTextMSg(
-      String receiverId, User_model senderM, User_model receiverM,{bool isImage = false}) async {
-    print("-------receiver id--${receiverId}");
+      String receiverId, User_model senderM, User_model receiverM,{bool isImage = false,bool isVoice = false,String? voiceFile}) async {
     if(isImage==true){
       final imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
       if(imageFile !=null){
         // isLoading.value = true;
         String fileName = imageFile.path.split('/').last;
-
-
-       // print(imageFile.path);
         Map<String, dynamic> map = {
           'receiver': receiverId, //:widget.receiver.id,
           'content': messageController.text,
+          'mediaType':'image',
           'media': MultipartFile(File(imageFile.path),filename: fileName),
-          // 'media':MultipartFile(file.path, filename: basename(file.path)),
-          // 'latitude':'0',
-          // 'longitude':'0',
         };
+        print("---map--------$map");
+        print("---imageFile.path--------${imageFile.path}");
+        print("---fileName--------$fileName");
+        print("---File(imageFile.path)--------${File(imageFile.path)}");
+        /*
+         ---map--------{receiver: 65b2c5a00fe1b62f19a71e35, content: , media: Instance of 'MultipartFile'}
+I/flutter (17085): ---imageFile.path--------/data/user/0/com.example.chat_app_with_myysql/cache/fd6d2b96-0f78-4e82-95ba-f0700c61b978/Screenshot_20231114-004115.png
+I/flutter (17085): ---fileName--------Screenshot_20231114-004115.png
+I/flutter (17085): ---File(imageFile.path)--------File: '/data/user/0/com.example.chat_app_with_myysql/cache/fd6d2b96-0f78-4e82-95ba-f0700c61b978/Screenshot_20231114-004115.png'
+I/flutter (17085): --ApiServices Response-headers-postApiWithFromDataAndHeaderAndContantType --null
+I/flutter (17085): --ApiServices Response body- --null
+E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: TimeoutException after 0:00:05.000000: Future not completed
+         */
         isLoading.value = true;
         Response response = await apiService
             .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
         isLoading.value = false;
+        print("-------response-------");
+        print(response.body);
+        if (response.statusCode != 200) return;
+
+        messageController.clear();
+        // {message: {_id: 65a8f0d47167cd6905ca637a, content: ty,
+        // media: {type: none}, location: {},
+        // sender: {_id: 65a2d97b556f1776a25a4d4f, username: n10, avatar: https://i.stack.imgur.com/34AD2.jpg},
+        //  chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
+        //  isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
+
+        String contant = '';
+        String mediaType = '';
+        String url = '';
+        String lati = '', longi = '';
+        String time = '';
+        time = response.body['message']['chat']['updatedAt'];
+        if (response.body['message']['location'] != null) {
+          if (response.body['message']['location']['latitude'] != null) {
+            lati = response.body['message']['location']['latitude'].toString();
+            longi = response.body['message']['location']['longitude'].toString();
+          }
+        }
+        if (response.body['message']['content'] != null) {
+          contant = response.body['message']['content'];
+        }
+        mediaType = response.body['message']['media']['type'];
+        print("----Media type-----${mediaType}");
+        if (response.body['message']['media']['url'] != null) {
+          url = response.body['message']['media']['url'];
+        }
+        chatList.add(ChatModel(
+            content: contant,
+            mediaType: mediaType,
+            url: url,
+            lati: lati,
+            longi: longi,
+            time: time,
+            sender: senderUser,
+            receiver: receiverUser));
+        scrolList(scrollController);
+      }
+    }
+
+
+    if(isVoice ==true){
+      print("----Media type--is---${isVoice}");
+      print("----FilePath---${voiceFile}");
+      // isLoading.value = true;
+      if(voiceFile !=null){
+        //await uploadFiles(voiceFile,receiverId);
+        await uploadFiles('storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4',receiverId);
+       //await uploadFiles('/storage/emulated/0/Download/file_example_MP3_2MG.mp3',receiverId);
+       // //storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4
+        return;
+        String fileName = voiceFile.split('/').last;
+        Map<String, dynamic> map = {
+          'receiver': "65789d8171514a281b248cbd",//receiverId, //:widget.receiver.id,
+          'content': '',
+          'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
+         // 'media': MultipartFile(File('/storage/emulated/0/Download/file_example_WAV_2MG.wav'),filename: fileName),
+          //'media': MultipartFile(File(voiceFile).readAsBytesSync(),filename: fileName),
+        };
+        print("---map--------${map}");
+        print("---imageFile.path--------${voiceFile}");
+        print("---fileName--------$fileName");
+        print("---File(imageFile.path)--------${File(voiceFile)}");
+        print("---File(imageFile.path)--------${MultipartFile(File(voiceFile),filename: fileName)}");
+
+        //isLoading.value = true;
+        Response response = await apiService
+            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
+       // isLoading.value = false;
         print("-------dddd-------");
         print(response.body);
         if (response.statusCode != 200) return;
@@ -159,33 +241,19 @@ class ChatController extends GetxController {
             sender: senderUser,
             receiver: receiverUser));
         scrolList(scrollController);
-
       }
     }
 
 
     if (messageController.text.isEmpty) return;
-
-    // XFile? xFile=await ImagePicker().pickImage(source: ImageSource.gallery);
-    // if(xFile==null)
-    //   return;
-    //
-    //
-    // File file=File(xFile.path);
-    // print(basename(file.path));
-    // EasyLoading.show();
     Map<String, dynamic> map = {
       'receiver': receiverId, //:widget.receiver.id,
       'content': messageController.text,
-      // 'media':MultipartFile(file.path, filename: basename(file.path)),
-      // 'latitude':'0',
-      // 'longitude':'0',
     };
     isLoading.value = true;
     Response response = await apiService
         .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
     isLoading.value = false;
-    // EasyLoading.dismiss();
     print(response.body);
 
     if (response.statusCode != 200) return;
@@ -194,9 +262,8 @@ class ChatController extends GetxController {
     // {message: {_id: 65a8f0d47167cd6905ca637a, content: ty,
     // media: {type: none}, location: {},
     // sender: {_id: 65a2d97b556f1776a25a4d4f, username: n10, avatar: https://i.stack.imgur.com/34AD2.jpg},
-    //  chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
-    //  isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
-
+    // chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
+    // isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
     String contant = '';
     String mediaType = '';
     String url = '';
@@ -334,4 +401,42 @@ class ChatController extends GetxController {
 //       }
 //     }
 // }
+
+Future<dynamic> uploadFiles(String filePath,String? recid)    async  {
+    print(filePath);
+    print(recid);
+    print("-------------");
+  String header=await getToken_praf();
+  print(header);
+  var headers = {
+    'Authorization': 'Bearer $header',
+    'Content-Type': 'multipart/form-data',
+    //'Cookie': 'connect.sid=s%3AUzoS90auAKH3VbpprDYfj-BBRlL2j8D7.dVGHiwnEzlku21Y0u5rWI7ocb1UcdekdSxaQ2w04Lpk'
+  };
+  var request = http.MultipartRequest(
+      'POST', Uri.parse('https://xwavetechnologies.com/user/sendmesseges'));
+  request.fields.addAll(
+      {
+        'receiver': recid??'65789d8171514a281b248cbd',
+        'content': '',
+        'mediaType':'video',
+  });
+  request.files.add(await http.MultipartFile.fromPath('media',
+      //'/Users/apple/Downloads/ast01.dev.itpvoice.net-1704835631.25357.mp3'
+    filePath,
+  ));
+  request.headers.addAll(headers);
+
+  http.StreamedResponse response = await request.send();
+
+  if (response.statusCode == 200) {
+    print("---------my chat response-----------");
+    print(await response.stream.bytesToString());
+  }
+  else {
+  print(response.reasonPhrase);
+  print(response.statusCode);
+  print(await response.stream.bytesToString());
+  }
+}
 }
