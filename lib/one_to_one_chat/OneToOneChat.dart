@@ -44,44 +44,45 @@ class OneToOneChat extends StatefulWidget {
 class _OneToOneChatState extends State<OneToOneChat> {
    ApiService apiService=ApiService();
   ChatController chatController = Get.put(ChatController());
-
-  ///AudioRecorder
+///Video Picker
+   File? galleryFile;
+   final picker = ImagePicker();
+   ///AudioRecorder
    AnotherAudioRecorder? _recorder;
    Recording? _current;
    RecordingStatus _currentStatus = RecordingStatus.Unset;
-   AudioPlayer audioPlayer = AudioPlayer();
-
+   // AudioPlayer audioPlayer = AudioPlayer();
    PlayerState playerState = PlayerState.stopped;
-   Duration _duration = Duration();
-   Duration _position = Duration();
+   // Duration _duration = Duration();
+   // Duration _position = Duration();
    String? _voicePat;
    bool _isPlaying = false;
 
    @override
    void initState() {
+     //
+     // audioPlayer.onDurationChanged.listen((Duration duration) {
+     //   setState(() {
+     //     _duration = duration;
+     //   });
+     //   print("listner-----onDurationChanged-");
+     // });
 
-     audioPlayer.onDurationChanged.listen((Duration duration) {
-       setState(() {
-         _duration = duration;
-       });
-       print("listner-----onDurationChanged-");
-     });
 
-
-     // Set up listeners for player state changes
-     audioPlayer.onPlayerStateChanged.listen((state) {
-       setState(() {
-         playerState = state;
-       });
-     });
-
-     audioPlayer.onPositionChanged.listen((Duration position) {
-       setState(() {
-         _position = position;
-
-       });
-       print("listner-----onPositionChanged-");
-     });
+     // // Set up listeners for player state changes
+     // audioPlayer.onPlayerStateChanged.listen((state) {
+     //   setState(() {
+     //     playerState = state;
+     //   });
+     // });
+     //
+     // audioPlayer.onPositionChanged.listen((Duration position) {
+     //   setState(() {
+     //     _position = position;
+     //
+     //   });
+     //   print("listner-----onPositionChanged-");
+     // });
 
      super.initState();
      valuesPrint();
@@ -141,6 +142,12 @@ class _OneToOneChatState extends State<OneToOneChat> {
       body: Obx(()=>
         Column(children: [
           myappBar(),
+        SizedBox(
+          height: 200.0,
+          width: 300.0,
+          child: galleryFile == null
+              ? const Center(child: Text('Sorry nothing selected!!'))
+              : Center(child: Text(galleryFile!.path)),),
           //--------------------Audio recording Start-------
           // Padding(
           //   padding: const EdgeInsets.all(8.0),
@@ -184,59 +191,59 @@ class _OneToOneChatState extends State<OneToOneChat> {
           //     backgroundColor: Colors.blueAccent.withOpacity(0.5),
           //   ),
           // ),
-         const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: _audioPlayerStart,
-            //onPlayAudio,
-            child: Text("Play", style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent.withOpacity(0.5),
-            ),
-          ),
+         // const SizedBox(width: 8),
+         //  ElevatedButton(
+         //    onPressed: _audioPlayerStart,
+         //    //onPlayAudio,
+         //    child: Text("Play", style: TextStyle(color: Colors.white)),
+         //    style: ElevatedButton.styleFrom(
+         //      backgroundColor: Colors.blueAccent.withOpacity(0.5),
+         //    ),
+         //  ),
+         //
+         //  Padding(
+         //    padding: const EdgeInsets.only(left: 100),
+         //    child: Container(
+         //      decoration: BoxDecoration(
+         //        color: Colors.yellow,
+         //        borderRadius: BorderRadius.circular(10),
+         //      ),
+         //      child: Row(
+         //        children: [
+         //          if (playerState == PlayerState.playing)
+         //            IconButton(
+         //              onPressed: () => _pause(),
+         //              icon: Icon(Icons.pause),
+         //            )
+         //          else
+         //            IconButton(
+         //              onPressed: () =>_play(),
+         //              icon:Icon(Icons.play_arrow),
+         //            ),
+         //          SizedBox(height: 20),
+         //
+         //          Flexible(
+         //            child: Slider(
+         //              value:
+         //                  _position.inMilliseconds.toDouble(),
+         //              onChanged: (double value) {
+         //                _seekTo(value);
+         //
+         //              },
+         //              min: 0.0,
+         //              max:
+         //
+         //                  _duration.inMilliseconds.toDouble(),
+         //            ),
+         //          ),
+         //        ],
+         //      ),
+         //    ),
+         //  ),
 
-          Padding(
-            padding: const EdgeInsets.only(left: 100),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.yellow,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  if (playerState == PlayerState.playing)
-                    IconButton(
-                      onPressed: () => _pause(),
-                      icon: Icon(Icons.pause),
-                    )
-                  else
-                    IconButton(
-                      onPressed: () =>_play(),
-                      icon:Icon(Icons.play_arrow),
-                    ),
-                  SizedBox(height: 20),
-
-                  Flexible(
-                    child: Slider(
-                      value:
-                          _position.inMilliseconds.toDouble(),
-                      onChanged: (double value) {
-                        _seekTo(value);
-
-                      },
-                      min: 0.0,
-                      max:
-
-                          _duration.inMilliseconds.toDouble(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          new Text("Status : $_currentStatus"),
-          new Text('Avg Power: ${_current?.metering?.averagePower}'),
-          new Text('Peak Power: ${_current?.metering?.peakPower}'),
+          // new Text("Status : $_currentStatus"),
+          // new Text('Avg Power: ${_current?.metering?.averagePower}'),
+          // new Text('Peak Power: ${_current?.metering?.peakPower}'),
           // new Text("File path of the record: ${_current?.path}"),
           // new Text("Format: ${_current?.audioFormat}"),
           // new Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
@@ -246,7 +253,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
           chatListWight(),
           Visibility(
               visible: !chatController.isMicTapped.value,
-              child: chatOptionsWight(),
+              child: chatOptionsWight(context),
           replacement:audioRecordingSheetWight(),
           ),
 
@@ -302,12 +309,13 @@ class _OneToOneChatState extends State<OneToOneChat> {
             ChatModel model=chatController.chatList[index];
 // print(model.sender.id);
             if(model.sender.id==widget.sender.id) {
-
+          ///Right
               return Align(
                   alignment: Alignment.centerRight,
                   child: chatHolder(model: model, chatBoxColor: appYellow));
             }
             else{
+              ///Left
               return Align(
                   alignment: Alignment.centerLeft,
                   child: chatHolder(model: model, chatBoxColor: applightWhite));
@@ -318,11 +326,11 @@ class _OneToOneChatState extends State<OneToOneChat> {
     );
   }
   
-  Widget chatOptionsWight(){
+  Widget chatOptionsWight(BuildContext context){
     return Row(children: [
       IconButton(onPressed: () {
       }, icon: const Icon(Icons.emoji_emotions_outlined)),
-      chatInputWight(),
+      chatInputWight(context),
       Visibility(
         visible: !chatController.isLoading.value,
         replacement: Padding(
@@ -335,11 +343,8 @@ class _OneToOneChatState extends State<OneToOneChat> {
       )
     ],);
   }
-
   Widget audioRecordingSheetWight(){
     return Row(children: [
-      // IconButton(onPressed: () {
-      // }, icon: const Icon(Icons.emoji_emotions_outlined)),
       chatInputAudioWight(),
       Visibility(
         visible: !chatController.isLoading.value,
@@ -355,36 +360,18 @@ class _OneToOneChatState extends State<OneToOneChat> {
                   print(result?.path);
                   print("----------current path --2");
                   chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isVoice: true,voiceFile: result?.path);
+                  chatController.isMicTapped.value=false;
                 } else {
                   null;
                 }
-
     },
-
-        //     () {
-        //    //chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver);
-        //  // con.isMicTapped.value=false;
-        //   print("-----button tapped--------1");
-        //
-        //    if(_currentStatus == RecordingStatus.Recording){
-        //      print("-----button tapped------2");
-        //      _stop;
-        //    }
-        //  //  if(_currentStatus != RecordingStatus.Unset){
-        //  //
-        //  //  _stop;
-        //  // // _audioPlayerStart();
-        //  //  }
-        // //  _currentStatus
-        //   //
-        // }
 
          icon: Icon(Icons.send,color: appYellow,)),
       )
     ],);
   }
 
-  Widget chatInputWight(){
+  Widget chatInputWight(BuildContext context){
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -398,9 +385,14 @@ class _OneToOneChatState extends State<OneToOneChat> {
             child: my_inputWithHint(controler: chatController.messageController, hint: 'Message',),
           )),
 
-          const  Padding(
-            padding:  EdgeInsets.all(2.0),
-            child: Icon(Icons.attach_file),
+          InkWell(
+            onTap: (){
+              _showPicker(context: context);
+            },
+            child: const  Padding(
+              padding:  EdgeInsets.all(2.0),
+              child: Icon(Icons.attach_file),
+            ),
           ),
           InkWell(
             onTap: (){
@@ -481,11 +473,9 @@ class _OneToOneChatState extends State<OneToOneChat> {
        ),
      ) ;
    }
-
-
-   Future<void> _seekTo(double value) async {
-     await audioPlayer.seek(Duration(milliseconds: value.round()));
-   }
+   // Future<void> _seekTo(double value) async {
+   //   await audioPlayer.seek(Duration(milliseconds: value.round()));
+   // }
   valuesPrint()async{
 
     print('chat id - '+widget.chatID);
@@ -519,14 +509,15 @@ class _OneToOneChatState extends State<OneToOneChat> {
        print(e);
      }
    }
-   _resume() async {
-     await _recorder?.resume();
-     setState(() {});
-   }
-   _pause() async {
-     await _recorder?.pause();
-     setState(() {});
-   }
+   // _resume() async {
+   //   await _recorder?.resume();
+   //   setState(() {});
+   // }
+   // _pause() async {
+   //   await _recorder?.pause();
+   //   setState(() {});
+   // }
+
    _stop() async {
      var result = await _recorder?.stop();
      print("Stop recording: ${result?.path}");
@@ -544,54 +535,109 @@ class _OneToOneChatState extends State<OneToOneChat> {
      });
    }
 
-   // Call to play audio from the beginning
-   _audioPlayerStart() async {
-     Source source = DeviceFileSource(_current!.path!);
-     await audioPlayer.play(source);
+   // // Call to play audio from the beginning
+   // _audioPlayerStart() async {
+   //   Source source = DeviceFileSource(_current!.path!);
+   //   await audioPlayer.play(source);
+   //
+   // }
 
+
+   // Widget _buildText(RecordingStatus status) {
+   //   var text = "";
+   //   switch (_currentStatus) {
+   //     case RecordingStatus.Initialized:
+   //       {
+   //         text = 'Start';
+   //         break;
+   //       }
+   //     case RecordingStatus.Recording:
+   //       {
+   //         text = 'Pause';
+   //         break;
+   //       }
+   //     case RecordingStatus.Paused:
+   //       {
+   //         text = 'Resume';
+   //         break;
+   //       }
+   //     case RecordingStatus.Stopped:
+   //       {
+   //         text = 'Init';
+   //         break;
+   //       }
+   //     default:
+   //       break;
+   //   }
+   //   return Text(text, style: TextStyle(color: Colors.black));
+   // }
+
+   // Future<void> _play() async {
+   //   Source source = DeviceFileSource(_current!.path!);
+   //        await audioPlayer.play(source);
+   //   setState(() {
+   //     _isPlaying = true;
+   //   });
+   // }
+
+
+
+   void _showPicker({
+     required BuildContext context,
+   }) {
+     showModalBottomSheet(
+       context: context,
+       builder: (BuildContext context) {
+         return SafeArea(
+           child: Wrap(
+             children: <Widget>[
+               ListTile(
+                 leading: const Icon(Icons.photo_library),
+                 title: const Text('Gallery'),
+                 onTap: () {
+                   getVideo(ImageSource.gallery,context);
+                   Navigator.of(context).pop();
+                 },
+               ),
+               ListTile(
+                 leading: const Icon(Icons.photo_camera),
+                 title: const Text('Camera'),
+                 onTap: () {
+                   getVideo(ImageSource.camera,context);
+                   Navigator.of(context).pop();
+                 },
+               ),
+             ],
+           ),
+         );
+       },
+     );
    }
 
-
-   Widget _buildText(RecordingStatus status) {
-     var text = "";
-     switch (_currentStatus) {
-       case RecordingStatus.Initialized:
-         {
-           text = 'Start';
-           break;
+   Future getVideo(
+       ImageSource img,
+       BuildContext context
+       ) async {
+     final pickedFile = await picker.pickVideo(
+         source: img,
+         preferredCameraDevice: CameraDevice.front,
+         maxDuration: const Duration(minutes: 10));
+     XFile? xfilePick = pickedFile;
+     setState(
+           () {
+         if (xfilePick != null) {
+           galleryFile = File(pickedFile!.path);
+         } else {
+           ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+               const SnackBar(content: Text('Nothing is selected')));
          }
-       case RecordingStatus.Recording:
-         {
-           text = 'Pause';
-           break;
-         }
-       case RecordingStatus.Paused:
-         {
-           text = 'Resume';
-           break;
-         }
-       case RecordingStatus.Stopped:
-         {
-           text = 'Init';
-           break;
-         }
-       default:
-         break;
-     }
-     return Text(text, style: TextStyle(color: Colors.black));
-   }
-
-   Future<void> _play() async {
-     Source source = DeviceFileSource(_current!.path!);
-          await audioPlayer.play(source);
-     setState(() {
-       _isPlaying = true;
-     });
+       },
+     );
    }
    @override
   void dispose() {
     unregisterEvent('new-message');
-    audioPlayer.dispose();
+    // audioPlayer.dispose();
     super.dispose();
   }
 }
