@@ -177,18 +177,19 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
       print("----FilePath---${voiceFile}");
       // isLoading.value = true;
       if(voiceFile !=null){
-        //await uploadFiles(voiceFile,receiverId);
-        await uploadFiles('storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4',receiverId);
-       //await uploadFiles('/storage/emulated/0/Download/file_example_MP3_2MG.mp3',receiverId);
-       // //storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4
-        return;
+       //  await uploadFiles(voiceFile,receiverId);
+       // // await uploadFiles('storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4',receiverId);
+       // //await uploadFiles('/storage/emulated/0/Download/file_example_MP3_2MG.mp3',receiverId);
+       // // //storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4
+       //  return;
         String fileName = voiceFile.split('/').last;
         Map<String, dynamic> map = {
-          'receiver': "65789d8171514a281b248cbd",//receiverId, //:widget.receiver.id,
+          'receiver': receiverId, //:widget.receiver.id,
           'content': '',
-          'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
+          'mediaType':'audio',
+          //'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
          // 'media': MultipartFile(File('/storage/emulated/0/Download/file_example_WAV_2MG.wav'),filename: fileName),
-          //'media': MultipartFile(File(voiceFile).readAsBytesSync(),filename: fileName),
+          'media': MultipartFile(File(voiceFile),filename: fileName),
         };
         print("---map--------${map}");
         print("---imageFile.path--------${voiceFile}");
@@ -196,15 +197,15 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         print("---File(imageFile.path)--------${File(voiceFile)}");
         print("---File(imageFile.path)--------${MultipartFile(File(voiceFile),filename: fileName)}");
 
-        //isLoading.value = true;
+        isLoading.value = true;
         Response response = await apiService
             .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
-       // isLoading.value = false;
+        isLoading.value = false;
         print("-------dddd-------");
         print(response.body);
         if (response.statusCode != 200) return;
 
-        messageController.clear();
+       // messageController.clear();
         // {message: {_id: 65a8f0d47167cd6905ca637a, content: ty,
         // media: {type: none}, location: {},
         // sender: {_id: 65a2d97b556f1776a25a4d4f, username: n10, avatar: https://i.stack.imgur.com/34AD2.jpg},
@@ -228,6 +229,7 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         }
         mediaType = response.body['message']['media']['type'];
         print("----Media type-----${mediaType}");
+
         if (response.body['message']['media']['url'] != null) {
           url = response.body['message']['media']['url'];
         }
@@ -240,6 +242,8 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
             time: time,
             sender: senderUser,
             receiver: receiverUser));
+        print("-------------");
+        print(chatList);
         scrolList(scrollController);
       }
     }
