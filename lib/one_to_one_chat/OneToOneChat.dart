@@ -51,10 +51,8 @@ class _OneToOneChatState extends State<OneToOneChat> {
    AnotherAudioRecorder? _recorder;
    Recording? _current;
    RecordingStatus _currentStatus = RecordingStatus.Unset;
-   // AudioPlayer audioPlayer = AudioPlayer();
    PlayerState playerState = PlayerState.stopped;
-   // Duration _duration = Duration();
-   // Duration _position = Duration();
+
    String? _voicePat;
    bool _isPlaying = false;
 
@@ -142,123 +140,12 @@ class _OneToOneChatState extends State<OneToOneChat> {
       body: Obx(()=>
         Column(children: [
           myappBar(),
-        SizedBox(
-          height: 200.0,
-          width: 300.0,
-          child: galleryFile == null
-              ? const Center(child: Text('Sorry nothing selected!!'))
-              : Center(child: Text(galleryFile!.path)),),
-          //--------------------Audio recording Start-------
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       switch (_currentStatus) {
-          //         case RecordingStatus.Initialized:
-          //           {
-          //             _start();
-          //             break;
-          //           }
-          //         case RecordingStatus.Recording:
-          //           {
-          //             _pause();
-          //             break;
-          //           }
-          //         case RecordingStatus.Paused:
-          //           {
-          //             _resume();
-          //             break;
-          //           }
-          //         case RecordingStatus.Stopped:
-          //           {
-          //             _init();
-          //             break;
-          //           }
-          //         default:
-          //           break;
-          //       }
-          //     },
-          //     child: _buildText(_currentStatus),
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: Colors.red,
-          //     ),
-          //   ),
-          // ),
-          // ElevatedButton(
-          //   onPressed: _currentStatus != RecordingStatus.Unset ? _stop : null,
-          //   child: Text("Stop", style: TextStyle(color: Colors.white)),
-          //   style: ElevatedButton.styleFrom(
-          //     backgroundColor: Colors.blueAccent.withOpacity(0.5),
-          //   ),
-          // ),
-         // const SizedBox(width: 8),
-         //  ElevatedButton(
-         //    onPressed: _audioPlayerStart,
-         //    //onPlayAudio,
-         //    child: Text("Play", style: TextStyle(color: Colors.white)),
-         //    style: ElevatedButton.styleFrom(
-         //      backgroundColor: Colors.blueAccent.withOpacity(0.5),
-         //    ),
-         //  ),
-         //
-         //  Padding(
-         //    padding: const EdgeInsets.only(left: 100),
-         //    child: Container(
-         //      decoration: BoxDecoration(
-         //        color: Colors.yellow,
-         //        borderRadius: BorderRadius.circular(10),
-         //      ),
-         //      child: Row(
-         //        children: [
-         //          if (playerState == PlayerState.playing)
-         //            IconButton(
-         //              onPressed: () => _pause(),
-         //              icon: Icon(Icons.pause),
-         //            )
-         //          else
-         //            IconButton(
-         //              onPressed: () =>_play(),
-         //              icon:Icon(Icons.play_arrow),
-         //            ),
-         //          SizedBox(height: 20),
-         //
-         //          Flexible(
-         //            child: Slider(
-         //              value:
-         //                  _position.inMilliseconds.toDouble(),
-         //              onChanged: (double value) {
-         //                _seekTo(value);
-         //
-         //              },
-         //              min: 0.0,
-         //              max:
-         //
-         //                  _duration.inMilliseconds.toDouble(),
-         //            ),
-         //          ),
-         //        ],
-         //      ),
-         //    ),
-         //  ),
-
-          // new Text("Status : $_currentStatus"),
-          // new Text('Avg Power: ${_current?.metering?.averagePower}'),
-          // new Text('Peak Power: ${_current?.metering?.peakPower}'),
-          // new Text("File path of the record: ${_current?.path}"),
-          // new Text("Format: ${_current?.audioFormat}"),
-          // new Text("isMeteringEnabled: ${_current?.metering?.isMeteringEnabled}"),
-          // new Text("Extension : ${_current?.extension}"),
-          // new Text("Audio recording duration : ${_current?.duration.toString()}"),
-          //--------------------Audio recording end
           chatListWight(),
           Visibility(
               visible: !chatController.isMicTapped.value,
-              child: chatOptionsWight(context),
+              child:chatOptionsWight(context),
           replacement:audioRecordingSheetWight(),
           ),
-
-
-
         ],),
       )
     );
@@ -307,7 +194,6 @@ class _OneToOneChatState extends State<OneToOneChat> {
         itemCount: chatController.chatList.length,
           itemBuilder: (context, index) {
             ChatModel model=chatController.chatList[index];
-// print(model.sender.id);
             if(model.sender.id==widget.sender.id) {
           ///Right
               return Align(
@@ -370,7 +256,6 @@ class _OneToOneChatState extends State<OneToOneChat> {
       )
     ],);
   }
-
   Widget chatInputWight(BuildContext context){
     return Expanded(
       child: Container(
@@ -473,9 +358,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
        ),
      ) ;
    }
-   // Future<void> _seekTo(double value) async {
-   //   await audioPlayer.seek(Duration(milliseconds: value.round()));
-   // }
+
   valuesPrint()async{
 
     print('chat id - '+widget.chatID);
@@ -627,6 +510,9 @@ class _OneToOneChatState extends State<OneToOneChat> {
            () {
          if (xfilePick != null) {
            galleryFile = File(pickedFile!.path);
+           if(   galleryFile!=null ){
+             chatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isVideo: true,videoPath:galleryFile!.path);
+           }
          } else {
            ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
                const SnackBar(content: Text('Nothing is selected')));

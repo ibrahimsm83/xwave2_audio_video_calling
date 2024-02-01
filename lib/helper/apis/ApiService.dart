@@ -37,7 +37,7 @@ class ApiService extends GetConnect{
   postApiWithFromDataAndHeaderAndContantType(String api,Map<String,dynamic> body)async{
     String header=await getToken_praf();
     print("--body- --${body}");
-    print(body['media']);
+   // print(body['media']);
     final response= await post(api, FormData(body), headers: {'Authorization': 'Bearer $header'},contentType: 'multipart/form-data');
    //print("--ApiServices Response-headers-postApiWithFromDataAndHeaderAndContantType --${response.statusText}");
    print("--ApiServices Response body- --${response.body}");
@@ -47,7 +47,6 @@ class ApiService extends GetConnect{
       return response;
     }
   }
-
 
   postApiWithHeaderAndBody(String api,Map<String,dynamic> body)async{
     String header=await getToken_praf();

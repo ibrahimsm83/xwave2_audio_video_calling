@@ -36,10 +36,9 @@ class _MessagesState extends State<Messages> {
       backgroundColor: appBlack,
       floatingActionButton: flottingBtn(),
       body: SafeArea(
-        child: Column(children: [
+        child: ListView(children: [
           header(),
           chatRoomContainer(),
-
         ],),
       ),
     );
