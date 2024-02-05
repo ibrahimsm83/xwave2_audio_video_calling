@@ -1,4 +1,4 @@
-import 'package:chat_app_with_myysql/Login/Login.dart';
+import 'package:chat_app_with_myysql/view/Login/Login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
