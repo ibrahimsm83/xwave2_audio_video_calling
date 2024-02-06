@@ -81,7 +81,6 @@ class _VerificationState extends State<Verification> {
 
                 if(newUser){
                   //close_all_go_next_page(Info(nbr: nbr,));
-                  //AppNavigator.navigateTo(Info(nbr: nbr,));
                   AppNavigator.navigateToReplaceAll(() {
                     Get.put(DashboardController());
                     return Info(nbr: nbr,);
@@ -94,7 +93,6 @@ class _VerificationState extends State<Verification> {
                   initSocket();
                   await checkConected();
                  // close_all_go_next_page(Home());
-                  //AppNavigator.navigateTo(Home());
                   AppNavigator.navigateToReplaceAll(() {
                     Get.put(DashboardController());
                     return  Home();

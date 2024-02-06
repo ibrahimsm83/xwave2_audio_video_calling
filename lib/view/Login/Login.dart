@@ -5,6 +5,7 @@ import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/apis/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/widget/myBtn.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/view/dashboard/Home.dart';
@@ -50,12 +51,15 @@ class _LoginState extends State<Login> {
   
   Widget container(){
     return Container(
-      width: Get.width,height: 320,
+     // width: Get.width,
+      height: 320,
       decoration: BoxDecoration(
         color: appBlack,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
 
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -146,12 +150,15 @@ class _LoginState extends State<Login> {
   }
 
   checkLogin()async{
-    bool b=await getLogin_praf();
-    if(b){
+    bool? b=await getLogin_praf();
+    if(b==true){
       initSocket();
       await checkConected();
-      Get.put(DashboardController());
-      close_all_go_next_page(Home());
+      //close_all_go_next_page(Home());
+      AppNavigator.navigateToReplaceAll((){
+        Get.put(DashboardController());
+        return Home();
+      });
     }
 
   }

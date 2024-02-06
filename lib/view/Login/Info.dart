@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
 import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/apis/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/widget/myBtn.dart';
 import 'package:chat_app_with_myysql/widget/my_input.dart';
 import 'package:chat_app_with_myysql/view/dashboard/Home.dart';
@@ -116,7 +118,11 @@ class _InfoState extends State<Info> {
                 await saveDataToPraf(id, token);
                 initSocket();
                 await checkConected();
-                close_all_go_next_page(Home());
+                //close_all_go_next_page(Home());
+                AppNavigator.navigateToReplaceAll(() {
+                  Get.put(DashboardController());
+                  return  Home();
+                });
               }
               else{
                 Get.snackbar('error', 'try again');
