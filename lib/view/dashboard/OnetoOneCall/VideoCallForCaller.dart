@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:agora_token_service/agora_token_service.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/widget/my_profile_container.dart';
@@ -277,11 +279,12 @@ class _VideoCallForCallerState extends State<VideoCallForCaller> {
         'receiverId':widget.user_model.id
       };
 
-      Response response=await apiService.postApiWithHeaderAndBody(makeVideoCallApi, body);
+      var response=await apiService.postApiWithHeaderAndBody(makeVideoCallApi, body);
       print(response.body);
       if(response.statusCode==200){
         status='Ringing';
-        widget.chanelName=response.body['data']['callId'];
+        var map=jsonDecode(response.body);
+        widget.chanelName=map['data']['callId'];
         channel=widget.chanelName;
         print(widget.chanelName);
         initAgora();
@@ -308,7 +311,7 @@ class _VideoCallForCallerState extends State<VideoCallForCaller> {
       'callId':widget.chanelName,
       'action':action
     };
-    Response response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
+    var response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
     print(response.body);
   }
 

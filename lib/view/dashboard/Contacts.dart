@@ -3,8 +3,9 @@ import 'dart:io';
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
+import 'package:chat_app_with_myysql/util/helper_functions.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/view/dashboard/one_to_one_chat/OneToOneChat.dart';
@@ -126,12 +127,13 @@ class _ContactsState extends State<Contacts> {
       'receiverId':id
     };
 
-    Response response=await apiService.postApiWithHeaderAndBody(createChat1To1, body);
+    var response=await apiService.postApiWithHeaderAndBody(createChat1To1, body);
     EasyLoading.dismiss();
     print(response.body);
     if(response.statusCode==200){
-      String chatId=response.body['chat']['_id'];
-      List<dynamic> responseUsersList=response.body['chat']['users'];
+      var map=jsonDecode(response.body);
+      String chatId=map['chat']['_id'];
+      List<dynamic> responseUsersList=map['chat']['users'];
       List<User_model> users=responseUsersList.map((e) => User_model.fromJson(e)).toList();
       print("-------contacts---1-");
       ChatController chatController = Get.put(ChatController());
@@ -155,6 +157,8 @@ class _ContactsState extends State<Contacts> {
     EasyLoading.show();
     List<Contact> contacts = await ContactsService.getContacts();
 
+    AppMessage.showMessage("contacts count: ${contacts.length}");
+
     List<Map<String,dynamic>> nbrs=[];
 
     contacts.forEach((element) {
@@ -172,17 +176,18 @@ class _ContactsState extends State<Contacts> {
     });
 
     Map<String,dynamic> map={
-      'contacts':nbrs
+      'contacts': nbrs
     };
 
-    Response response=await apiService.postApiWithHeaderAndBody(appInstallUsers, map);
+    var response=await apiService.postApiWithHeaderAndBody(appInstallUsers,
+        jsonEncode(map));
     EasyLoading.dismiss();
     print(response.body);
 
     if(response.statusCode==200){
-
+      var map=jsonDecode(response.body);
      // Map<String,dynamic> jsonResponse=jsonDecode(response.body);
-     List<dynamic> registerusers=response.body['data']['registeredUsers'];
+     List<dynamic> registerusers=map['data']['registeredUsers'];
 
      list=registerusers.map((e) => User_model.fromJson(e)).toList();
 

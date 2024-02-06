@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
@@ -85,12 +87,13 @@ class _LoginState extends State<Login> {
             Map<String,dynamic> body={
               "phoneNumber":number.phoneNumber
             };
-            Response response=await apiService.postApiWithBody(sendOTP, body);
+            var response=await apiService.postApiWithBody(sendOTP, body);
             EasyLoading.dismiss();
             print(response.body);
             if(response.statusCode==200)
               {
-                String otp=response.body['otp'];
+                var map=jsonDecode(response.body);
+                String otp=map['otp'];
                 next_page(Verification(nbr: number.phoneNumber!, otp: otp));
               }
             else{

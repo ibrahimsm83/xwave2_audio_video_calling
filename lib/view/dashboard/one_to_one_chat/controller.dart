@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:chat_app_with_myysql/Models/ChatModel.dart';
 import 'package:chat_app_with_myysql/Models/User_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -24,7 +24,7 @@ class ChatController extends GetxController {
 
   ///Sender User
   final Rx<User_model> _senderUser =
-      User_model(id: "", phoneNumber: "", avatar: "", username: "").obs;
+      User_model(id: "", phoneNumber: "", avatar: "", username: "",infoAbout: "").obs;
 
   set senderUser(User_model senderUser) => _senderUser.value = senderUser;
 
@@ -32,7 +32,7 @@ class ChatController extends GetxController {
 
   ///Receiver User
   final Rx<User_model> _receiverUser =
-      User_model(id: "", phoneNumber: "", avatar: "", username: "").obs;
+      User_model(id: "", phoneNumber: "", avatar: "", username: "",infoAbout: "").obs;
 
   set receiverUser(User_model receiverUser) =>
       _receiverUser.value = receiverUser;
@@ -50,14 +50,14 @@ class ChatController extends GetxController {
     chatList.value = [];
     //isLoading.value = true;
     EasyLoading.show();
-    Response response =
-    await apiService.getApiWithToken(fetch1To1chat + receiverId);
+    var response = await apiService.getApiWithToken(fetch1To1chat + receiverId);
     print(response.body);
     EasyLoading.dismiss();
     //isLoading.value = false;
 
     if (response.statusCode == 200) {
-      List<dynamic> list = response.body;
+      var map=jsonDecode(response.body);
+      List<dynamic> list = map;
 
       list.forEach((element) {
         String contant = '';
@@ -109,11 +109,11 @@ class ChatController extends GetxController {
         String fileName = imageFile.path
             .split('/')
             .last;
-        Map<String, dynamic> map = {
+        Map<String, String> map = {
           'receiver': receiverId, //:widget.receiver.id,
           'content': messageController.text,
           'mediaType': 'image',
-          'media': MultipartFile(File(imageFile.path), filename: fileName),
+         // 'media': MultipartFile(File(imageFile.path), filename: fileName),
         };
         print("---map--------$map");
         print("---imageFile.path--------${imageFile.path}");
@@ -129,11 +129,13 @@ I/flutter (17085): --ApiServices Response body- --null
 E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: TimeoutException after 0:00:05.000000: Future not completed
          */
         isLoading.value = true;
-        Response response = await apiService
-            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
+        var response = await apiService
+            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map,
+            files: [
+              await http.MultipartFile.fromPath("media", imageFile.path,filename: fileName),
+            ]);
         isLoading.value = false;
         print("-------response-------");
-        print(response.body);
         if (response.statusCode != 200) return;
 
         messageController.clear();
@@ -149,21 +151,24 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         String lati = '',
             longi = '';
         String time = '';
-        time = response.body['message']['chat']['updatedAt'];
-        if (response.body['message']['location'] != null) {
-          if (response.body['message']['location']['latitude'] != null) {
-            lati = response.body['message']['location']['latitude'].toString();
+        Stream stream = response.stream.transform(const Utf8Decoder());
+        String body = await stream.first;
+        var map1=jsonDecode(body);
+        time = map1['message']['chat']['updatedAt'];
+        if (map1['message']['location'] != null) {
+          if (map1['message']['location']['latitude'] != null) {
+            lati = map1['message']['location']['latitude'].toString();
             longi =
-                response.body['message']['location']['longitude'].toString();
+                map1['message']['location']['longitude'].toString();
           }
         }
-        if (response.body['message']['content'] != null) {
-          contant = response.body['message']['content'];
+        if (map1['message']['content'] != null) {
+          contant = map1['message']['content'];
         }
-        mediaType = response.body['message']['media']['type'];
+        mediaType = map1['message']['media']['type'];
         print("----Media type-----${mediaType}");
-        if (response.body['message']['media']['url'] != null) {
-          url = response.body['message']['media']['url'];
+        if (map1['message']['media']['url'] != null) {
+          url = map1['message']['media']['url'];
         }
         chatList.add(ChatModel(
             content: contant,
@@ -191,14 +196,14 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         String fileName = voiceFile
             .split('/')
             .last;
-        Map<String, dynamic> map = {
+        Map<String, String> map = {
           'receiver': receiverId,
           //:widget.receiver.id,
           'content': '',
           'mediaType': 'audio',
           //'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
           // 'media': MultipartFile(File('/storage/emulated/0/Download/file_example_WAV_2MG.wav'),filename: fileName),
-          'media': MultipartFile(File(voiceFile), filename: fileName),
+         // 'media': MultipartFile(File(voiceFile), filename: fileName),
         };
         print("---map--------${map}");
         print("---imageFile.path--------${voiceFile}");
@@ -208,11 +213,12 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
             File(voiceFile), filename: fileName)}");
 
         isLoading.value = true;
-        Response response = await apiService
-            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
+        var response = await apiService
+            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map,files: [
+          await http.MultipartFile.fromPath("media", voiceFile,filename: fileName),
+        ]);
         isLoading.value = false;
         print("-------dddd-------");
-        print(response.body);
         if (response.statusCode != 200) return;
 
         // messageController.clear();
@@ -228,22 +234,25 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         String lati = '',
             longi = '';
         String time = '';
-        time = response.body['message']['chat']['updatedAt'];
-        if (response.body['message']['location'] != null) {
-          if (response.body['message']['location']['latitude'] != null) {
-            lati = response.body['message']['location']['latitude'].toString();
+        Stream stream = response.stream.transform(const Utf8Decoder());
+        String body = await stream.first;
+        var map1=jsonDecode(body);
+        time = map1['message']['chat']['updatedAt'];
+        if (map1['message']['location'] != null) {
+          if (map1['message']['location']['latitude'] != null) {
+            lati = map1['message']['location']['latitude'].toString();
             longi =
-                response.body['message']['location']['longitude'].toString();
+                map1['message']['location']['longitude'].toString();
           }
         }
-        if (response.body['message']['content'] != null) {
-          contant = response.body['message']['content'];
+        if (map1['message']['content'] != null) {
+          contant = map1['message']['content'];
         }
-        mediaType = response.body['message']['media']['type'];
+        mediaType = map1['message']['media']['type'];
         print("----Media type-----${mediaType}");
 
-        if (response.body['message']['media']['url'] != null) {
-          url = response.body['message']['media']['url'];
+        if (map1['message']['media']['url'] != null) {
+          url = map1['message']['media']['url'];
         }
         chatList.add(ChatModel(
             content: contant,
@@ -337,15 +346,14 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
 
 
     if (messageController.text.isEmpty) return;
-    Map<String, dynamic> map = {
+    Map<String, String> map = {
       'receiver': receiverId, //:widget.receiver.id,
       'content': messageController.text,
     };
     isLoading.value = true;
-    Response response = await apiService
+    var response = await apiService
         .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
     isLoading.value = false;
-    print(response.body);
 
     if (response.statusCode != 200) return;
 
@@ -361,19 +369,22 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
     String lati = '',
         longi = '';
     String time = '';
-    time = response.body['message']['chat']['updatedAt'];
-    if (response.body['message']['location'] != null) {
-      if (response.body['message']['location']['latitude'] != null) {
-        lati = response.body['message']['location']['latitude'].toString();
-        longi = response.body['message']['location']['longitude'].toString();
+    Stream stream = response.stream.transform(const Utf8Decoder());
+    String body = await stream.first;
+    var map1=jsonDecode(body);
+    time = map1['message']['chat']['updatedAt'];
+    if (map1['message']['location'] != null) {
+      if (map1['message']['location']['latitude'] != null) {
+        lati = map1['message']['location']['latitude'].toString();
+        longi = map1['message']['location']['longitude'].toString();
       }
     }
-    if (response.body['message']['content'] != null) {
-      contant = response.body['message']['content'];
+    if (map1['message']['content'] != null) {
+      contant = map1['message']['content'];
     }
-    mediaType = response.body['message']['media']['type'];
-    if (response.body['message']['media']['url'] != null) {
-      url = response.body['message']['media']['url'];
+    mediaType = map1['message']['media']['type'];
+    if (map1['message']['media']['url'] != null) {
+      url = map1['message']['media']['url'];
     }
     chatList.add(ChatModel(
         content: contant,
@@ -432,9 +443,9 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         longi: longi,
         time: time,
         sender:
-        User_model(id: senderId, phoneNumber: '', avatar: '', username: ''),
+        User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
         receiver: User_model(
-            id: receiverId, phoneNumber: '', avatar: '', username: '')));
+            id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
 
     print("lisntneeeeeeee");
     print(senderUser.id);

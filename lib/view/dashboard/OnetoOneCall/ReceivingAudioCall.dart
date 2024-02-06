@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
@@ -98,7 +98,7 @@ class _ReceivingAudioCallState extends State<ReceivingAudioCall> {
       'callId':widget.chanaelID,
       'action':action
     };
-    Response response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
+    var response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
     print(response.body);
   }
 

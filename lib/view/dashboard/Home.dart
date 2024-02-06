@@ -1,6 +1,6 @@
 
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/view/dashboard/OnetoOneCall/ReceivingAudioCall.dart';
@@ -71,7 +71,8 @@ class _HomeState extends State<Home> {
         String callerAvatar=newMessage['from']['avatar'];
         String callerName=newMessage['from']['username'];
 
-        User_model callerModel=User_model(id: callerID, phoneNumber: callerPhone, avatar: callerAvatar, username: callerName);
+        User_model callerModel=User_model(id: callerID, phoneNumber: callerPhone,
+            avatar: callerAvatar, username: callerName,infoAbout: "");
 
         next_page(ReceivingAudioCall(caller: callerModel, chanaelID: chanelName));
 
@@ -88,7 +89,8 @@ class _HomeState extends State<Home> {
         String callerAvatar=newMessage['from']['avatar'];
         String callerName=newMessage['from']['username'];
 
-        User_model callerModel=User_model(id: callerID, phoneNumber: callerPhone, avatar: callerAvatar, username: callerName);
+        User_model callerModel=User_model(id: callerID, phoneNumber: callerPhone,
+            avatar: callerAvatar, username: callerName,infoAbout: "");
 
         next_page(VideoCallForReceiver(  user_model: callerModel, chanelName: chanelName,));
 

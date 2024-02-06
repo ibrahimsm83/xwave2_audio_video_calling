@@ -1,7 +1,9 @@
 import 'package:chat_app_with_myysql/app/resources/dimen.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
+import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
+import 'package:chat_app_with_myysql/view/dashboard/settings/profile/edit_profile.dart';
 import 'package:chat_app_with_myysql/widget/app_bar.dart';
 import 'package:chat_app_with_myysql/widget/background.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
@@ -31,20 +33,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Center(
-            child: CircularPic(
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: (){
+            AppNavigator.navigateTo(EditProfile());
+          },child: Column(children: [
+            CircularPic(
               diameter: AppSizer.getHeight(80),
               imageType: ImageType.TYPE_NETWORK,
               image: dashboardController.user_model!.avatar,
             ),
-          ),
-          CustomText(
-            text: dashboardController.user_model!.username,
-            fontsize: 18,
-            fontweight: FontWeight.w600,
-            fontcolor: AppColor.colorWhite,
-            textAlign: TextAlign.center,
-          ),
+            CustomText(
+              text: dashboardController.user_model!.username,
+              fontsize: 18,
+              fontweight: FontWeight.w600,
+              fontcolor: AppColor.colorWhite,
+              textAlign: TextAlign.center,
+            ),
+          ],),),
+
           Expanded(
               child: Container(
 

@@ -1,9 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
@@ -150,7 +151,7 @@ class _MessagesState extends State<Messages> {
 
   fetchRooms()async{
 
-    Response response=await apiService.getApiWithToken(fetch1To1chatRooms);
+    var response=await apiService.getApiWithToken(fetch1To1chatRooms);
      print(response.body.toString());
     // // [{_id: 65a65648ffdcd322af8fd0fd,
     // // users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, avatar: https://i.stack.imgur.com/34AD2.jpg, username: n10}],
@@ -162,7 +163,8 @@ class _MessagesState extends State<Messages> {
 
     chatRoomsModels.clear();
 
-    List<dynamic> list=response.body;
+    var map=jsonDecode(response.body);
+    List<dynamic> list=map;
 
     list.forEach((element) {
       String chatID='';
@@ -192,19 +194,23 @@ class _MessagesState extends State<Messages> {
   //User_model? user_model;
   getUserInfo()async{
 
-    Response response=await apiService.getApiWithToken(userInfo);
+    var response=await apiService.getApiWithToken(userInfo);
     print('info '+response.body.toString());
 
     // {status: success, userData: {user_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, avatar: https://i.stack.imgur.com/34AD2.jpg, infoAbout: sdsdsd, username: n100}}
 
-    if(response.body['userData']==null)
+    var map=jsonDecode(response.body);
+    if(map['userData']==null)
       return;
-    String id=response.body['userData']['user_id'];
-    String name=response.body['userData']['username'];
-    String phone=response.body['userData']['phoneNumber'];
-    String avatar=response.body['userData']['avatar'];
+    String id=map['userData']['user_id'];
+    String name=map['userData']['username'];
+    String phone=map['userData']['phoneNumber'];
+    String avatar=map['userData']['avatar'];
+    String infoAbout = map['userData']["infoAbout"];
 
-    dashboardController.user_model=User_model(id: id, phoneNumber: phone, avatar: avatar, username: name);
+    dashboardController.user_model=User_model(id: id, phoneNumber: phone,
+        avatar: avatar, infoAbout: infoAbout,
+        username: name);
     setState(() {
 
     });

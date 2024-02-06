@@ -5,7 +5,7 @@ import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
 import 'package:chat_app_with_myysql/view/Login/Login.dart';
-import 'package:chat_app_with_myysql/view/dashboard/settings/my_profile.dart';
+import 'package:chat_app_with_myysql/view/dashboard/settings/profile/my_profile.dart';
 import 'package:chat_app_with_myysql/widget/app_bar.dart';
 import 'package:chat_app_with_myysql/widget/background.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
@@ -16,6 +16,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsScreen extends StatefulWidget {
+
+  static const route="/SettingsScreen";
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override

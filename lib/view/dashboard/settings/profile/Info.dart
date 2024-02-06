@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 
 class Info extends StatefulWidget {
@@ -100,21 +102,23 @@ class _InfoState extends State<Info> {
               }
 
 
-              Map<String,dynamic> body={
+              Map<String,String> body={
                 'username':name.text,
                 'infoAbout':info.text,
                 'phoneNumber':widget.nbr,
-                'avatar':img!
+             //   'avatar':img!
               };
 
               EasyLoading.show();
-              Response response=await apiService.postApiWithFromData(updateInfo, body);
+              var response=await apiService.postApiWithFromData(updateInfo, body,
+                  files: [await http.MultipartFile.fromPath("avatar", img!.path)]);
               EasyLoading.dismiss();
-              print(response.body);
               if(response.statusCode==200){
-                print(response.body['userData']['user_id']);
-                String id=response.body['userData']['user_id'];
-                String token=response.body['token'];
+                Stream stream = response.stream.transform(const Utf8Decoder());
+                String body = await stream.first;
+                var map=jsonDecode(body);
+                String id=map['userData']['user_id'];
+                String token=map['token'];
                 await saveDataToPraf(id, token);
                 initSocket();
                 await checkConected();

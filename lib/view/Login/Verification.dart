@@ -1,14 +1,16 @@
+import 'dart:convert';
+
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/view/dashboard/Home.dart';
-import 'package:chat_app_with_myysql/view/Login/Info.dart';
+import 'package:chat_app_with_myysql/view/dashboard/settings/profile/Info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -67,15 +69,16 @@ class _VerificationState extends State<Verification> {
 
               };
 
-              Response response=await apiService.postApiWithBody(verifyOTP, body);
+              var response=await apiService.postApiWithBody(verifyOTP, body);
               print('samak - '+response.body.toString());
               EasyLoading.dismiss();
               if(response.statusCode==400){
-                EasyLoading.showError(response.body['message']);
+                var map=jsonDecode(response.body);
+                EasyLoading.showError(map['message']);
               }
               else if(response.statusCode==200){
-
-                bool newUser=response.body['newUser'];
+                var map=jsonDecode(response.body);
+                bool newUser=map['newUser'];
 
 
 
@@ -87,8 +90,8 @@ class _VerificationState extends State<Verification> {
                   });
                 }
                 else{
-                  String id=response.body['user_id'];
-                  String token=response.body['token'];
+                  String id=map['user_id'];
+                  String token=map['token'];
                   await saveDataToPraf(id, token);
                   initSocket();
                   await checkConected();
@@ -119,12 +122,13 @@ class _VerificationState extends State<Verification> {
                 Map<String,dynamic> body={
                   "phoneNumber":nbr
                 };
-                Response response=await apiService.postApiWithBody(sendOTP, body);
+                var response=await apiService.postApiWithBody(sendOTP, body);
                 EasyLoading.dismiss();
                 print(response.body);
                 if(response.statusCode==200)
                 {
-                  otp=response.body['otp'];
+                  var map=jsonDecode(response.body);
+                  otp=map['otp'];
                   EasyLoading.showSuccess('OTP send');
                 }
                 else{

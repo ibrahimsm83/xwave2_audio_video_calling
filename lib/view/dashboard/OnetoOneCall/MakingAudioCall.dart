@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app_with_myysql/Models/User_model.dart';
-import 'package:chat_app_with_myysql/util/apis/ApiService.dart';
-import 'package:chat_app_with_myysql/util/apis/SocketManager.dart';
-import 'package:chat_app_with_myysql/util/apis/apis.dart';
+import 'package:chat_app_with_myysql/service/network/ApiService.dart';
+import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/app/resources/myColors.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
@@ -85,7 +85,7 @@ class _MakingAudioCallState extends State<MakingAudioCall> {
 
 
     print("dialing url: $makeAudioCallApi");
-    Response response=await apiService.postApiWithHeaderAndBody(makeAudioCallApi, body);
+    var response=await apiService.postApiWithHeaderAndBody(makeAudioCallApi, body);
     print("dial response: ${jsonEncode(response.body)}");
 
     // {data: {from: {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, avatar: https://i.stack.imgur.com/34AD2.jpg},
@@ -96,7 +96,8 @@ class _MakingAudioCallState extends State<MakingAudioCall> {
 
     if(response.statusCode==200) {
       status = 'Ringing...';
-      chanelID=response.body['data']['callId'];
+      var map=jsonDecode(response.body);
+      chanelID=map['data']['callId'];
 
 
       registerEvent('call_accepted', acceptListner);
@@ -121,7 +122,7 @@ class _MakingAudioCallState extends State<MakingAudioCall> {
     };
 
     print("call action url: ${audioCallActionsApi}");
-    Response response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
+    var response=await apiService.postApiWithHeaderAndBody(audioCallActionsApi, map);
     print("call action response: ${response.body}");
   }
 
