@@ -1,5 +1,5 @@
 
-import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
 import 'package:chat_app_with_myysql/widget/icons.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';

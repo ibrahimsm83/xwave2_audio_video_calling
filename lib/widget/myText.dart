@@ -1,4 +1,4 @@
-import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

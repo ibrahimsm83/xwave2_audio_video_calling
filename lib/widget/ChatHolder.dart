@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
-import '../Models/ChatModel.dart';
+import '../model/ChatModel.dart';
 import 'myText.dart';
 
 // ignore: camel_case_types

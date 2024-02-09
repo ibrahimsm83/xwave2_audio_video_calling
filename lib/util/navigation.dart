@@ -1,5 +1,5 @@
-import 'package:chat_app_with_myysql/app/resources/integer.dart';
-import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/resources/integer.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';

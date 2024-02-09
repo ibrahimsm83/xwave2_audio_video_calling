@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app_with_myysql/app/resources/asset_path.dart';
-import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/resources/asset_path.dart';
+import 'package:chat_app_with_myysql/resources/lang/strings.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
+import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:flutter/material.dart';
+
 
 class CustomImage extends StatelessWidget {
   final String? image;
@@ -94,6 +97,16 @@ class ShadowContainer extends StatelessWidget {
         child: child,
       ),
     );
+  }
+}
+
+
+class NotFoundText extends StatelessWidget {
+  const NotFoundText({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: CustomText(text: AppStrings.TEXT_OBJECT_NOT_FOUND,fontsize: 13,),);
   }
 }
 

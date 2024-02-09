@@ -1,5 +1,5 @@
-import 'package:chat_app_with_myysql/app/resources/dimen.dart';
-import 'package:chat_app_with_myysql/app/resources/myColors.dart';
+import 'package:chat_app_with_myysql/resources/dimen.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:flutter/material.dart';

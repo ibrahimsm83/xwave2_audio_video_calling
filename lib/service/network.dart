@@ -8,6 +8,8 @@ class Network{
   static const int STATUS_OK=200,STATUS_BAD_REQUEST=400,STATUS_UNAUTHORIZED=401,
       STATUS_NOTFOUND=404;
 
+  static const STATUS_SUCCESS="success";
+
   static Network? _instance;
 
   Network._();
