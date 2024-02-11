@@ -1,9 +1,12 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_token_service/agora_token_service.dart';
 import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../view/user/dashboard/OnetoOneCall/RunningAudioCall.dart';
 
 class CallService extends GetxService{
   late RtcEngine _engine;
@@ -24,40 +27,65 @@ class CallService extends GetxService{
 
   void init() async{
     _engine = createAgoraRtcEngine();
+    print("engine initilizing");
     await _engine.initialize(const RtcEngineContext(
       appId: AppConfig.AGORA_APP_ID,
       channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
     ));
+    print("engine initilized");
     _addListeners();
     //  await _engine.enableWebSdkInteroperability(true);
+   // await _engine.setEnableSpeakerphone(_loudSpeaker);
+    await _engine.setClientRole(role:ClientRoleType.clientRoleBroadcaster);
     if(call.type==VoiceCall.TYPE_VIDEO) {
       await _engine.enableVideo();
     }
-    await _engine.setEnableSpeakerphone(_loudSpeaker);
+
     await _engine.startPreview();
+    print("preview started");
 
     // await _engine.enableWebSdkInteroperability(true);
     //await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     // await _engine.setChannelProfile(ChannelProfile.Communication);
-    await _engine.setClientRole(role:ClientRoleType.clientRoleBroadcaster);
+
     await _joinChannel();
+    await _engine.setEnableSpeakerphone(_loudSpeaker);
+    print("loudspeaker: ${await _engine.isSpeakerphoneEnabled()}");
+
   }
 
-  void destroy(){
-    _engine.release();
+  void destroy() async{
+    await _engine.leaveChannel();
+    await _engine.release();
   }
 
 
   bool get initialized => _initialized;
 
   Future<void> _joinChannel() async{
-    await _engine.joinChannel(token:call.token!, channelId:call.channel!,
-        uid:call.user.num_id,
+    print("call token: ${call.token}");
+    String token=getToken();
+    print("new call token 1: ${token}");
+/*    await _engine.joinChannel(token:token, channelId:call.channel!,
+        uid:0,
         options: const ChannelMediaOptions(),
       // ChannelMediaOptions(publishLocalAudio: true, publishLocalVideo: true)
+    );*/
+    _engine.joinChannelWithUserAccount(token:token, channelId:call.channel!,
+        userAccount:call.user.id,options: const ChannelMediaOptions());
+  }
+
+  String getToken(){
+    var token= RtcTokenBuilder.build(
+      appId: AppConfig.AGORA_APP_ID,
+      appCertificate: AppConfig.AGORA_APP_SECRET,
+      channelName: call.channel!,
+      //uid: "0",
+      uid: call.user.id,
+      role: role,
+      expireTimestamp: expireTimestamp,
     );
-    // _engine.registerLocalUserAccount(AppConfig.AGORA_APP_ID, call.user.name);
-    //_engine.joinChannelWithUserAccount(call.token, call.channel, "{\"uid\":\"${call.user.id!}\"}");
+    return token;
   }
 
 
@@ -86,8 +114,13 @@ class CallService extends GetxService{
     }
   }
 
+  void switchCamera(){
+    _engine.switchCamera();
+  }
+
   void toggleLoudSpeaker(bool value){
     _loudSpeaker=value;
+    print("loud spealer toggle: $_loudSpeaker");
     _engine.setEnableSpeakerphone(value);
   }
 
@@ -98,7 +131,7 @@ class CallService extends GetxService{
           print("error is: $error $err");
         },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          debugPrint("local user ${connection.localUid} joined");
+          debugPrint("join channel success ${connection.localUid} joined");
           callEventHandler.onSelfJoin();
         },
         onLocalUserRegistered: (uid,info){
@@ -107,12 +140,14 @@ class CallService extends GetxService{
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           debugPrint("remote user $remoteUid joined");
+          callEventHandler.onUserJoined(remoteUid);
         },
         onUserInfoUpdated: (uid,info){
           print("userInfoUpdated: $uid ${info.toJson()}");
         },
         onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
           debugPrint("remote user $remoteUid left channel");
+          callEventHandler.onUserLeave(remoteUid);
         },
         onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
           debugPrint('[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');

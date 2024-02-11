@@ -25,11 +25,19 @@ class VoiceCall{
     this.category, this.status,});
 
 
-  factory VoiceCall.fromMap(Map map,{User_model? dialer,User_model? receiver,int? side}){
-    var channel=map["channel"];
-    return VoiceCall(id:map["call_id"].toString(), channel: channel["channel"], token: channel["token"],
-      dialer: dialer,side: side,type: map["type"],status: map["call_status"],category: map["call_type"],
-      receiver: receiver,);
+  factory VoiceCall.fromMap(Map map,{int? side,User_model? dialer,User_model? receiver,
+    String? category,String? status,}){
+   // var channel=map["channel"];
+    return VoiceCall(id:map["callId"], token: map["agoraToken"],
+      channel: map["channelName"],side: side,dialer: dialer,receiver: receiver,
+        status: status,
+        category: category);
+  }
+
+  Map<String,dynamic> toJson(){
+    return {
+      "callId":id,"agoraToken":token,"channelName":channel,
+    };
   }
 
   bool get isDialed => side==SIDE_DIALER;
@@ -40,6 +48,8 @@ class VoiceCall{
   bool get isEnded => status==VoiceCall.STATUS_ENDED;
 
   bool get isGroup => category==VoiceCall.CATEGORY_GROUP;
+
+  bool get isVideo => type==VoiceCall.TYPE_VIDEO;
 
   User_model get user=>isDialed?dialer!:receiver!;
 

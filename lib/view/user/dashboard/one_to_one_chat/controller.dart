@@ -135,7 +135,7 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
               await http.MultipartFile.fromPath("media", imageFile.path,filename: fileName),
             ]);
         isLoading.value = false;
-        print("-------response-------");
+        print("-------response------- ${response.statusCode}");
         if (response.statusCode != 200) return;
 
         messageController.clear();
@@ -153,6 +153,7 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         String time = '';
         Stream stream = response.stream.transform(const Utf8Decoder());
         String body = await stream.first;
+        print("chat response is: $body");
         var map1=jsonDecode(body);
         time = map1['message']['chat']['updatedAt'];
         if (map1['message']['location'] != null) {

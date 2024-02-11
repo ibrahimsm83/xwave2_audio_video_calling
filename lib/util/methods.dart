@@ -14,6 +14,9 @@ close_all_go_next_page(var page){
 scrolList(ScrollController scrollController)async{
   Future.delayed(Duration(seconds: 1)).then((value) {
 
-    scrollController.animateTo(scrollController.position.maxScrollExtent, duration: Duration(seconds: 1), curve: Curves.easeInOut);
+    if(scrollController.hasClients) {
+      scrollController.animateTo(scrollController.position.maxScrollExtent,
+          duration: Duration(seconds: 1), curve: Curves.easeInOut);
+    }
   });
 }

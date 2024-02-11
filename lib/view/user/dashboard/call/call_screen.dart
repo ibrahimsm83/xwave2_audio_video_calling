@@ -1,6 +1,9 @@
 import 'package:chat_app_with_myysql/controller/user/call_controller.dart';
+import 'package:chat_app_with_myysql/controller/user/controller.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/resources/integer.dart';
+import 'package:chat_app_with_myysql/resources/myColors.dart';
+import 'package:chat_app_with_myysql/service/socket.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/call/audio.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/call/video.dart';
 import 'package:chat_app_with_myysql/widget/background.dart';
@@ -23,8 +26,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin{
   late Animation<double> animation;
   late AnimationController animationController;
 
+  final DashboardController dashboardController=Get.find<DashboardController>();
+
   @override
   void initState(){
+    dashboardController.socketService.addEvent(SocketEvent.HANDLE_CALL_EVENT);
     animationController=AnimationController(vsync: this,
         duration: const Duration(//milliseconds: 3000,
             milliseconds: AppInteger.SWIPE_DURATION_MILLI
@@ -34,11 +40,20 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin{
   }
 
   @override
+  void dispose() {
+    dashboardController.socketService.removeEvent(SocketEvent.HANDLE_CALL_EVENT);
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
-        canPop: false,
+        canPop: true,
         child: CustomBackground(
+            bgColor: AppColor.appBlack,
             child: Scaffold(
+                backgroundColor: AppColor.colorTransparent,
                 body: GetBuilder<CallController>(
                     builder: (cont){
                       final VoiceCall? currentCall = cont.currentCall;

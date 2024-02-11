@@ -54,16 +54,24 @@ class SocketService {
 
   void addEvents(List<String> events) {
     events.forEach((event) {
-      _socket!.on(event, (data) {
-        _handler!.onEvent(event, data);
-      });
+      addEvent(event);
     });
   }
 
   void removeEvents(List<String> events) {
     events.forEach((event) {
-      _socket!.off(event);
+      removeEvent(event);
     });
+  }
+
+  void addEvent(String event){
+    _socket!.on(event, (data) {
+      _handler!.onEvent(event, data);
+    });
+  }
+
+  void removeEvent(String event){
+    _socket!.off(event);
   }
 
   void disconnect() {
@@ -76,7 +84,9 @@ class SocketService {
 class SocketEvent {
   static const REGISTER = 'register';
   static const AUDIO_CALL = "incoming_audio_call",
-      VIDEO_CALL = "incoming_video_call",CALL_ACCEPTED="call_accepted",
+      VIDEO_CALL = "incoming_video_call",
+      HANDLE_CALL_EVENT="handleCall",
+      CALL_ACCEPTED="call_accepted",
       CALL_REJECTED="call_rejected",CALL_ENDED="call_ended";
   static const CHAT_LIST_UPDATE="chatListUpdate";
 

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:chat_app_with_myysql/controller/user/call_controller.dart';
 import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
@@ -130,6 +131,8 @@ class _OneToOneChatState extends State<OneToOneChat> {
      }
    }
 
+   final CallController callController=Get.find<CallController>();
+
   @override
   Widget build(BuildContext context) {
 
@@ -167,14 +170,14 @@ class _OneToOneChatState extends State<OneToOneChat> {
             myText(text: widget.receiver.username,color: Colors.white,size: 16,fontWeight: FontWeight.w500,),
             Spacer(),
             IconButton(onPressed: () {
-
-              next_page(MakingAudioCall(receiver: widget.receiver));
+              callController.audioCall(widget.receiver);
+            //  next_page(MakingAudioCall(receiver: widget.receiver));
 
 
             }, icon: Icon(CupertinoIcons.phone,color: appYellow,)),
             IconButton(onPressed: () {
-
-              next_page(VideoCallForCaller( user_model: widget.receiver, chanelName: '',));
+              callController.videoCall(widget.receiver);
+              //next_page(VideoCallForCaller( user_model: widget.receiver, chanelName: '',));
             }, icon: Icon(CupertinoIcons.video_camera,color: appYellow,)),
 
           ],),

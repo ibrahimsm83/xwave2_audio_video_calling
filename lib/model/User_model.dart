@@ -4,7 +4,13 @@ class User_model {
   String? access_token;
   bool? profile_completed;
 
-  int get num_id=>int.parse(id);
+  int? _num_id;
+
+  set num_id(int id) => _num_id=id;
+
+  int get num_id => _num_id??0;
+
+  //int get num_id=>int.tryParse(id,radix: 16)??0;
 
   User_model({
     required this.id,
@@ -26,6 +32,16 @@ class User_model {
       avatar: json["avatar"] ?? '',
       username: json["username"] ?? '',
       infoAbout: json["infoAbout"] ?? "",
+    );
+  }
+
+  factory User_model.fromCallJson(Map<String, dynamic> json) {
+    return User_model(
+      id: json["_id"] ?? '',
+      phoneNumber: json["phoneNumber"] ?? '',
+      avatar: json["avatar"] ?? '',
+      username: json["username"] ?? '',
+      infoAbout: "",
     );
   }
 

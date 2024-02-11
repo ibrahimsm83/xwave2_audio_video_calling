@@ -7,6 +7,6 @@ class AppConfig{
 
 
   static const AGORA_APP_ID="15d11305b1954adcaaa33f8c5c946f1b";
-  //static const AGORA_APP_SECRET="8a9b916340eb4f9d8b7c1be9bdce6b9a";
+  static const AGORA_APP_SECRET="e17ded873e50483e9406035bf0882ba7";
 
 }

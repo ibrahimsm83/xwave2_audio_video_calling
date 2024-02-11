@@ -107,7 +107,8 @@ class DateTimeManager {
         val += "${_getUnit(secs)}:";
       }
     });
-    //val = val.removeCharAt(val.length - 1);
+    val=val.replaceRange(val.length - 1, val.length, "");
+
     return val;
   }
 

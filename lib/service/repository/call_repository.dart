@@ -8,8 +8,8 @@ class CallRepository {
 
   Future<VoiceCall?> makeCall(String token, String receiver, String type) async {
     VoiceCall? user;
-    final String url = AppConfig.DIRECTORY + type==VoiceCall.TYPE_AUDIO?"user/startAudioCall":
-    "user/startVidoCall";
+    final String url = AppConfig.DIRECTORY + (type==VoiceCall.TYPE_AUDIO?"user/startAudioCall":
+    "user/startVidoCall");
     print("makeCall url: $url");
     final map = {"receiverId": receiver,};
     print("makeCall map: $map");
@@ -17,14 +17,13 @@ class CallRepository {
       url,
       map,
       // headers: {'Content-type': 'application/json'},
+      headers: {"Authorization":"Bearer $token"},
       onSuccess: (val) {
         print("makeCall response: $val");
         var map = jsonDecode(val);
-        bool status = map["status"] == Network.STATUS_SUCCESS;
-        if (status) {
-          user=VoiceCall();
-          //  user = map["otp"];
-        }
+       // bool status = map["status"] == Network.STATUS_SUCCESS;
+        var data=map["data"];
+        user=VoiceCall.fromMap(data);
         //AppMessage.showMessage(map["message"].toString());
       },
     );
@@ -41,6 +40,7 @@ class CallRepository {
       url,
       map,
       // headers: {'Content-type': 'application/json'},
+      headers: {"Authorization":"Bearer $token"},
       onSuccess: (val) {
         print("callAction response: $val");
         var map = jsonDecode(val);

@@ -24,12 +24,14 @@ class chatHolder extends StatefulWidget {
 
 class _chatHolderState extends State<chatHolder> {
   AudioPlayer audioPlayer = AudioPlayer();
-  late VideoPlayerController _controller;
+  //late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   bool isPlaying=false;
   Duration duration=Duration.zero;
   Duration position=Duration.zero;
-  late Chewie _chewie;
-  late ChewieController _chewieController;
+  //late Chewie _chewie;
+  //late ChewieController _chewieController;
+  ChewieController? _chewieController;
 
   @override
   void initState() {
@@ -66,15 +68,15 @@ class _chatHolderState extends State<chatHolder> {
           setState(() {});
         });
       _chewieController = ChewieController(
-        videoPlayerController: _controller,
+        videoPlayerController: _controller!,
         autoPlay: false,
         looping: false,
       );
-      _chewie = Chewie(
+    /*  _chewie = Chewie(
         controller: _chewieController,
-      );
-      _chewieController.addListener(() {
-        if (!_chewieController.isFullScreen) {
+      );*/
+      _chewieController!.addListener(() {
+        if (!_chewieController!.isFullScreen) {
           SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         }
       });
@@ -86,8 +88,8 @@ class _chatHolderState extends State<chatHolder> {
   }
   @override
   void dispose() {
-    _controller.dispose();
-    _chewieController.dispose();
+    _controller?.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
@@ -234,7 +236,8 @@ class _chatHolderState extends State<chatHolder> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
-          width: 340,
+          //width: 340,
+        width: 300,
           decoration: BoxDecoration(
             color:  widget.chatBoxColor,
             borderRadius: BorderRadius.circular(10),
@@ -243,11 +246,12 @@ class _chatHolderState extends State<chatHolder> {
           child:Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _controller.value.isInitialized?
+              _controller!.value.isInitialized?
               AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
+                //aspectRatio: _controller!.value.aspectRatio,
+                aspectRatio: 3/3,
                 child: Chewie(
-                  controller: _chewieController,
+                  controller: _chewieController!,
                 ),
               )
                   :Center(
