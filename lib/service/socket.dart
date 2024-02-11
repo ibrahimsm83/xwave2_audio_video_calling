@@ -1,7 +1,7 @@
+import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class SocketService{
-
+class SocketService {
   //static SocketService? _instance;
 
   IO.Socket? _socket;
@@ -9,9 +9,12 @@ class SocketService{
 
   final String url;
 
- // SocketService._();
+  // SocketService._();
+  IO.Socket get socket => _socket!;
 
-  SocketService(this.url,);
+  SocketService(
+    this.url,
+  );
 
   /*factory SocketService() {
     return _instance??=SocketService._();
@@ -23,14 +26,16 @@ class SocketService{
 
   bool get isConnected => _socket!.connected;
 
-
-  void connect(SocketMessageHandler handler,{List<String> events= const []}){
-
+  void connect(SocketMessageHandler handler, {List<String> events = const []}) {
     print("socket url: $url");
-    _socket = IO.io(url, IO.OptionBuilder().
-    setTransports(['websocket']).disableAutoConnect().build());
+    _socket = IO.io(
+        url,
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .disableAutoConnect()
+            .build());
 
-    _handler=handler;
+    _handler = handler;
     //final String event=SocketEvent.GET_MESSAGE;
 
     _socket!.onConnect(_handler!.onConnect);
@@ -38,51 +43,41 @@ class SocketService{
     _socket!.onConnectError(_handler!.onConnectionError);
     _socket!.onError(_handler!.onError);
 
+    addEvents(events);
+
+    _socket!.connect();
+  }
+
+  void emitData(String event, dynamic data) {
+    _socket!.emit(event, data);
+  }
+
+  void addEvents(List<String> events) {
     events.forEach((event) {
       _socket!.on(event, (data) {
         _handler!.onEvent(event, data);
       });
     });
-
-    _socket!.connect();
-
   }
 
-  void emitData(String event,dynamic data){
-    _socket!.emit(event,data);
+  void removeEvents(List<String> events) {
+    events.forEach((event) {
+      _socket!.off(event);
+    });
   }
 
-
-  void disconnect(){
+  void disconnect() {
     _socket!.dispose();
-   // _socket!.disconnect();
-   // _socket!.close();
+    // _socket!.disconnect();
+    // _socket!.close();
   }
-
 }
 
-class SocketEvent{
-  static const SEND_LOCATION="send-location";
-}
-
-mixin SocketMessageHandler{
-  void onConnect(data){
-    print("socket connected: $data");
-  }
-  void onDisconnect(data){
-    print("socket disconnected: $data");
-  }
-
-  void onConnectionError(data){
-    print("socket connection error: $data");
-  }
-
-  void onError(data){
-    print("socket error: $data");
-  }
-
-  void onEvent(String name,data){
-    print("socket event triggered: ${name} with ${data}");
-  }
+class SocketEvent {
+  static const REGISTER = 'register';
+  static const AUDIO_CALL = "incoming_audio_call",
+      VIDEO_CALL = "incoming_video_call",CALL_ACCEPTED="call_accepted",
+      CALL_REJECTED="call_rejected",CALL_ENDED="call_ended";
+  static const CHAT_LIST_UPDATE="chatListUpdate";
 
 }

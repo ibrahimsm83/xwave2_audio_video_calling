@@ -58,8 +58,8 @@ class _HomeState extends State<Home> {
     super.initState();
     // initSocket();
 
-    registerEvent('incoming_audio_call', incomingCallListner);
-    registerEvent('incoming_video_call', incomingVideoCallListner);
+    /*registerEvent('incoming_audio_call', incomingCallListner);
+    registerEvent('incoming_video_call', incomingVideoCallListner);*/
   }
 
   incomingCallListner(dynamic newMessage)async{

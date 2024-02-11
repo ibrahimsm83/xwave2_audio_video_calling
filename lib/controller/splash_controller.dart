@@ -40,7 +40,7 @@ class SplashController extends GetxController{
   }
 
   void _goToDashboard({Map? initialMap}) async{
-    await initSocket();
+    //await initSocket();
     //await checkConected();
     Get.delete<SplashController>();
     AppNavigator.navigateToReplaceAll((){
@@ -55,12 +55,6 @@ class SplashController extends GetxController{
       Get.put(TrackingController());
       return DashboardScreen();
     });*/
-  }
-
-  checkConected()async{
-    while(socket!=null&&!socket!.connected){
-      await Future.delayed(Duration(milliseconds: 100));
-    }
   }
 
 }

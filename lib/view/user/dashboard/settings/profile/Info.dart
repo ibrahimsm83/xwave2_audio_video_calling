@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_app_with_myysql/controller/auth_controller.dart';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
@@ -29,6 +30,8 @@ class Info extends StatefulWidget {
 }
 
 class _InfoState extends State<Info> {
+
+  final AuthController authController=Get.find<AuthController>();
 
   File? img;
   var name=TextEditingController();
@@ -88,20 +91,8 @@ class _InfoState extends State<Info> {
             SizedBox(height: 30,),
             myBtn(text: 'Upload', color: appYellow, gestureDetector: GestureDetector(onTap: () async{
 
-              if(img==null)
-                {
-                  Get.snackbar('Error', 'Select image');
-
-                  return;
-                }
-
-              if(name.text.isEmpty||info.text.isEmpty){
-                Get.snackbar('Error', 'fill all the fields');
-
-                return;
-              }
-
-
+              authController.completeProfile(widget.nbr, name.text, info.text, img);
+/*
               Map<String,String> body={
                 'username':name.text,
                 'infoAbout':info.text,
@@ -120,8 +111,8 @@ class _InfoState extends State<Info> {
                 String id=map['userData']['user_id'];
                 String token=map['token'];
                 await saveDataToPraf(id, token);
-                initSocket();
-                await checkConected();
+                *//*initSocket();
+                await checkConected();*//*
                 //close_all_go_next_page(Home());
                 AppNavigator.navigateToReplaceAll(() {
                   Get.put(DashboardController());
@@ -130,7 +121,7 @@ class _InfoState extends State<Info> {
               }
               else{
                 Get.snackbar('error', 'try again');
-              }
+              }*/
 
 
 
@@ -151,11 +142,11 @@ class _InfoState extends State<Info> {
     );
   }
 
-  checkConected()async{
+/*  checkConected()async{
     while(socket!=null&&!socket!.connected){
       await Future.delayed(Duration(milliseconds: 100));
     }
-  }
+  }*/
 }
 
 

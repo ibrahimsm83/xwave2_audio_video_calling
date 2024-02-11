@@ -254,7 +254,6 @@ class _MessagesState extends State<Messages> {
 
   @override
   void dispose() {
-
     unregisterEvent('chatListUpdate');
     super.dispose();
   }
