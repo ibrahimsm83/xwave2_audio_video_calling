@@ -25,38 +25,52 @@ class CallService extends GetxService{
   }
 
 
-  void init() async{
+  Future<void> init() async{
     _engine = createAgoraRtcEngine();
     print("engine initilizing");
     await _engine.initialize(const RtcEngineContext(
       appId: AppConfig.AGORA_APP_ID,
       channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+      logConfig: LogConfig(
+      level: LogLevel.logLevelNone,
+    ),
     ));
     print("engine initilized");
     _addListeners();
-    //  await _engine.enableWebSdkInteroperability(true);
+     // await _engine.enableWebSdkInteroperability(true);
    // await _engine.setEnableSpeakerphone(_loudSpeaker);
+   // await _engine.setChannelProfile(ChannelProfileType.channelProfileCommunication);
     await _engine.setClientRole(role:ClientRoleType.clientRoleBroadcaster);
     if(call.type==VoiceCall.TYPE_VIDEO) {
       await _engine.enableVideo();
     }
-
     await _engine.startPreview();
+    //await _engine.enableLocalVideo(true);
     print("preview started");
 
-    // await _engine.enableWebSdkInteroperability(true);
-    //await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    // await _engine.setChannelProfile(ChannelProfile.Communication);
-
     await _joinChannel();
+
     await _engine.setEnableSpeakerphone(_loudSpeaker);
     print("loudspeaker: ${await _engine.isSpeakerphoneEnabled()}");
 
   }
 
+  void enableVideo(){
+    _engine.enableVideo();
+  }
+
+  void disableVideo(){
+    _engine.disableVideo();
+  }
+
+
   void destroy() async{
+    call.guest.num_id=0;
     await _engine.leaveChannel();
     await _engine.release();
+
+   // _engine.unregisterEventHandler(eventHandler);
+    print("agora engine destroyed");
   }
 
 
@@ -72,7 +86,8 @@ class CallService extends GetxService{
       // ChannelMediaOptions(publishLocalAudio: true, publishLocalVideo: true)
     );*/
     _engine.joinChannelWithUserAccount(token:token, channelId:call.channel!,
-        userAccount:call.user.id,options: const ChannelMediaOptions());
+        userAccount:call.user.id,options: const ChannelMediaOptions(
+        ));
   }
 
   String getToken(){
@@ -80,7 +95,6 @@ class CallService extends GetxService{
       appId: AppConfig.AGORA_APP_ID,
       appCertificate: AppConfig.AGORA_APP_SECRET,
       channelName: call.channel!,
-      //uid: "0",
       uid: call.user.id,
       role: role,
       expireTimestamp: expireTimestamp,
@@ -106,11 +120,11 @@ class CallService extends GetxService{
   void switchAudioVideo(){
     if(call.type==VoiceCall.TYPE_VIDEO){
       call.type=VoiceCall.TYPE_AUDIO;
-      _engine.disableVideo();
+      disableVideo();
     }
     else if(call.type==VoiceCall.TYPE_AUDIO){
       call.type=VoiceCall.TYPE_VIDEO;
-      _engine.enableVideo();
+      enableVideo();
     }
   }
 
@@ -124,38 +138,63 @@ class CallService extends GetxService{
     _engine.setEnableSpeakerphone(value);
   }
 
+  late RtcEngineEventHandler eventHandler;
+
   void _addListeners() {
+    eventHandler= RtcEngineEventHandler(
+      onFirstLocalAudioFramePublished:(con,id){
+        print("firstLocalAudioFramePublished $con $id");
+      },
+      onFirstRemoteAudioFrame:(con,id,_){
+        print("firstRemoteAudioFramePublished $con $id $_");
+      },
+      onFirstLocalVideoFrame:(con,id,_,__){
+        print("firstLocalVideoFramePublished $con $id $_ $__");
+      },
+      onFirstRemoteVideoFrame: (con,id,_,__,___){
+        print("firstRemoteVideoFramePublished $con $id $_ $__ $___");
+      },
+/*        firstRemoteAudioFrame: (uid,elapsed){
+          print("firstRemoteAudioFrame: $uid");
+        },
+        firstRemoteVideoFrame: (uid,width,height,elapsed){
+          print("firstRemoteVideoFrame: $uid");
+        },
+        remoteVideoStats: (stats){
+          print("remoteVideoStats: ${stats}");
+        },*/
+
+      onError: (error,err){
+        print("error is: $error $err");
+      },
+      onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+        debugPrint("join channel success ${connection.localUid} joined");
+        callEventHandler.onSelfJoin();
+      },
+      onLocalUserRegistered: (uid,info){
+        print("localUserRegistered: $uid ${info}");
+        //  _engine.joinChannelWithUserAccount(call.token, call.channel, info);
+      },
+      onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+        debugPrint("remote user $remoteUid joined");
+        callEventHandler.onUserJoined(remoteUid);
+      },
+      onUserInfoUpdated: (uid,info){
+        print("userInfoUpdated: $uid ${info.toJson()}");
+      },
+      onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
+        debugPrint("remote user $remoteUid left channel");
+        callEventHandler.onUserLeave(remoteUid);
+      },
+      onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
+        debugPrint('[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
+      },
+      onLeaveChannel: (con,stats) {
+        print("leaveChannel: $con $stats");
+      },
+    );
     _engine.registerEventHandler(
-      RtcEngineEventHandler(
-        onError: (error,err){
-          print("error is: $error $err");
-        },
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          debugPrint("join channel success ${connection.localUid} joined");
-          callEventHandler.onSelfJoin();
-        },
-        onLocalUserRegistered: (uid,info){
-          print("localUserRegistered: $uid ${info}");
-          //  _engine.joinChannelWithUserAccount(call.token, call.channel, info);
-        },
-        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          debugPrint("remote user $remoteUid joined");
-          callEventHandler.onUserJoined(remoteUid);
-        },
-        onUserInfoUpdated: (uid,info){
-          print("userInfoUpdated: $uid ${info.toJson()}");
-        },
-        onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
-          debugPrint("remote user $remoteUid left channel");
-          callEventHandler.onUserLeave(remoteUid);
-        },
-        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
-          debugPrint('[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
-        },
-        onLeaveChannel: (con,stats) {
-          print("leaveChannel: $con $stats");
-        },
-      ),
+      eventHandler,
     );
   }
 
@@ -171,12 +210,17 @@ class CallService extends GetxService{
       child: const rtc_local_view.TextureView(),
     );*/
   }
-  Widget remoteView(int id) {
-    return Container(child: AgoraVideoView(
+  Widget remoteView(int id,{Key? key}) {
+    return Container(
+        key: key,
+        child: AgoraVideoView(
+         // key:key,
       controller: VideoViewController.remote(
         rtcEngine: _engine,
-        canvas: VideoCanvas(uid: id),
+        canvas: VideoCanvas(uid: id,renderMode: RenderModeType.renderModeFit),
         connection: RtcConnection(channelId: call.channel!),
+       // useFlutterTexture: false,
+        //useAndroidSurfaceView: true
       ),
     ));
 /*    return Container(child: rtc_remote_view.TextureView(

@@ -75,9 +75,10 @@ class CallController extends GetxController implements CallEventHandler {
     }
   }
 
-  void _initCallService() {
+  void _initCallService() async{
     _callService = CallService(call: _currentCall!, callEventHandler: this);
-    _callService!.init();
+    await _callService!.init();
+    //update();
   }
 
   void _destroyCallService() {
@@ -153,18 +154,16 @@ class CallController extends GetxController implements CallEventHandler {
     return _callService!.localView();
   }
 
-  Widget renderRemoteView(int id) {
-    return _callService!.remoteView(id);
+  Widget renderRemoteView(int id,{Key? key,}) {
+    return _callService!.remoteView(id,key: key);
   }
 
   void videoCall(User_model receiver) {
     _dial(receiver, VoiceCall.TYPE_VIDEO);
-    //  AppNavigator.navigateTo(VideoCallScreen());
   }
 
   void audioCall(User_model receiver) {
     _dial(receiver, VoiceCall.TYPE_AUDIO);
-    //AppNavigator.navigateTo(CallScreen());
   }
 
   void _dial(User_model receiver, String type) async {
@@ -218,6 +217,7 @@ class CallController extends GetxController implements CallEventHandler {
   }
 
   void endCall({bool notify = true}) async {
+    print("call ended");
     if (onCall) {
       _currentCall!.status = VoiceCall.STATUS_ENDED;
       if (notify) {
@@ -294,6 +294,7 @@ class CallController extends GetxController implements CallEventHandler {
   void onUserJoined(int id) {
     currentCall!.guest.num_id = id;
     _setCallConnected();
+   // _callService?.enableVideo();
   }
 
   @override

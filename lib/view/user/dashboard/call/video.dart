@@ -76,11 +76,27 @@ class _VideoCallLayoutState extends AudioCallLayoutState {
     );
   }
 
+  GlobalKey? key;
+
+  @override
+  void dispose() {
+    print("video disposed");
+    super.dispose();
+  }
+
   Widget remoteView(VoiceCall currentCall) {
+    print("remoteView id: ${currentCall.guest.num_id} $key");
     return Container(
       child: ((currentCall.isConnected || currentCall.isConnecting) &&
               currentCall.guest.num_id != 0)
-          ? callController.renderRemoteView(currentCall.guest.num_id)
+          ? Builder(
+            builder: (context) {
+              print("remote builder called $key");
+              return callController.renderRemoteView(currentCall.guest.num_id,
+                  //key: key??=GlobalKey()
+              );
+            }
+          )
           : CustomImage(
               image: currentCall.guest.avatar,
               imageType: ImageType.TYPE_NETWORK,

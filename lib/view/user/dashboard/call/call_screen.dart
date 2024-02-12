@@ -49,7 +49,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin{
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        canPop: true,
+        canPop: false,
         child: CustomBackground(
             bgColor: AppColor.appBlack,
             child: Scaffold(
