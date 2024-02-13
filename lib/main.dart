@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialBinding: InitialBinding(),
+      debugShowCheckedModeBanner: false,
       home: SplashScreen(),
        builder: EasyLoading.init(),
     );

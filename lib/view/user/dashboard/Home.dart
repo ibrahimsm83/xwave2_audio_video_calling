@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       bottomNavigationBar: bottom_nav(),
       body: screens[selected],
     );

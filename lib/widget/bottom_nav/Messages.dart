@@ -207,7 +207,6 @@ class _MessagesState extends State<Messages> {
     String phone=map['userData']['phoneNumber'];
     String avatar=map['userData']['avatar'];
     String infoAbout = map['userData']["infoAbout"];
-
     dashboardController.user_model=User_model(id: id, phoneNumber: phone,
         avatar: avatar, infoAbout: infoAbout,
         username: name);
