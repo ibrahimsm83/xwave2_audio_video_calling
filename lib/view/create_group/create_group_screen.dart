@@ -1,8 +1,12 @@
+import 'package:chat_app_with_myysql/controller/user/controller.dart';
+import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/create_group_user_model.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/assets_manager.dart';
 import 'package:chat_app_with_myysql/widget/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({Key? key}) : super(key: key);
@@ -12,40 +16,70 @@ class CreateGroupScreen extends StatefulWidget {
 }
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
-  final _groupNameController = TextEditingController();
+  final ContactController contactController = Get.find<ContactController>();
+  List<User_model>? contactList;
+  List<String> userIdsList = [];
   List<CreateGroupUserModel> userList = [
-    CreateGroupUserModel(
-        id: "0", name: "ali", isSelected: false, imageUrl: ImageAssets.person1),
-    CreateGroupUserModel(
-        id: "1",
-        name: "kashif",
-        isSelected: false,
-        imageUrl: ImageAssets.person2),
-    CreateGroupUserModel(
-        id: "2",
-        name: "jhon",
-        isSelected: false,
-        imageUrl: ImageAssets.person3),
-    CreateGroupUserModel(
-        id: "3",
-        name: "smith",
-        isSelected: false,
-        imageUrl: ImageAssets.person4),
-    CreateGroupUserModel(
-        id: "4", name: "tom", isSelected: false, imageUrl: ImageAssets.person5),
-    CreateGroupUserModel(
-        id: "5",
-        name: "james",
-        isSelected: false,
-        imageUrl: ImageAssets.person6),
-    CreateGroupUserModel(
-        id: "6",
-        name: "wick",
-        isSelected: false,
-        imageUrl: ImageAssets.person7),
+    // CreateGroupUserModel(
+    //     id: "0", name: "ali", isSelected: false, imageUrl: ImageAssets.person1),
+    // CreateGroupUserModel(
+    //     id: "1",
+    //     name: "kashif",
+    //     isSelected: false,
+    //     imageUrl: ImageAssets.person2),
+    // CreateGroupUserModel(
+    //     id: "2",
+    //     name: "jhon",
+    //     isSelected: false,
+    //     imageUrl: ImageAssets.person3),
+    // CreateGroupUserModel(
+    //     id: "3",
+    //     name: "smith",
+    //     isSelected: false,
+    //     imageUrl: ImageAssets.person4),
+    // CreateGroupUserModel(
+    //     id: "4", name: "tom", isSelected: false, imageUrl: ImageAssets.person5),
+    // CreateGroupUserModel(
+    //     id: "5",
+    //     name: "james",
+    //     isSelected: false,
+    //     imageUrl: ImageAssets.person6),
+    // CreateGroupUserModel(
+    //     id: "6",
+    //     name: "wick",
+    //     isSelected: false,
+    //     imageUrl: ImageAssets.person7),
   ];
 
-  List<String> userIdsList=[];
+  @override
+  void initState() {
+    contactController.loadApiContacts();
+    contactList = contactController.users.value.data;
+    loadData();
+    print(contactList);
+    print("--------2--------------");
+    super.initState();
+  }
+
+  final _groupNameController = TextEditingController();
+
+  void loadData() {
+    if (contactList != null) {
+      for (int i = 0; i < contactList!.length; i++) {
+        userList.add(CreateGroupUserModel(
+            id: contactList![i].id,
+            name: contactList![i].username,
+            isSelected: false,
+            imageUrl: contactList![i].avatar));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    userList.clear();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +100,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 color: Colors.yellow,
               )),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: IconButton(onPressed: (){
+              contactController.loadApiContacts();
+              contactList = contactController.users.value.data;
+              loadData();
+            }, icon: Icon(Icons.refresh,color: AppColor.appYellow,)),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -120,38 +164,44 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       fontWeight: FontWeight.w500),
                 ),
               ),
-              // Row(
-              //   children: [
-              //     usersList(userList),
-              //   ],
-              // ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                //color: Colors.red,
-                child: Wrap(
-                  alignment: WrapAlignment.start,
-                  spacing: 20.0,
-                  runSpacing: 10.0,
-                  children: List.generate(userList.length, (index) {
-                    return userCircular(
-                        userModel: userList[index],
-                        onTap1: () {
-                          print("--onTap---");
-                        if(userList[index].isSelected){
-                          userList[index].isSelected=false;
-                          userIdsList.removeWhere((e) => e==userList[index].id);
-                        }else{
-                          userList[index].isSelected=true;
-                          userIdsList.add(userList[index].id);
-                        }
-                          print(userIdsList);
-                          setState(() {});
-                        });
-
-                  }),
-                ),
-              ),
-
+              Obx(() {
+                print(
+                    "--obx is Loading----${contactController.isLoading.value}");
+                // else {
+                print("------------");
+                print(userList);
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 20.0,
+                    runSpacing: 10.0,
+                    children: List.generate(contactController.isLoading.value?8: userList.length, (index) {
+                      if (contactController.isLoading.value) {
+                        return buildUserImageShimmer();
+                      } else {
+                        return userCircular(
+                            userModel: userList[index],
+                            onTap1: () {
+                              if (userList[index].isSelected) {
+                                userList[index].isSelected = false;
+                                userIdsList.removeWhere(
+                                    (e) => e == userList[index].id);
+                              } else {
+                                userList[index].isSelected = true;
+                                userIdsList.add(userList[index].id);
+                              }
+                              print("UserIdList-----------");
+                              print(userIdsList);
+                              setState(() {});
+                            });
+                      }
+                    }),
+                  ),
+                );
+                //}
+              }),
+              const SizedBox(height: 50.0),
               Padding(
                 padding: const EdgeInsets.only(top: 30),
                 child: button(
@@ -159,12 +209,82 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     color: appYellow,
                     context: context,
                     onTap: () {
+                      if (_groupNameController.text.isNotEmpty) {
+                      } else {
+                        Get.snackbar('Error', 'Enter Group Name',
+                            backgroundColor: Colors.red);
+                      }
                       //Navigator.pushNamed(context, CustomRouteNames.kWorkingHourScreenRoute);
                     }),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildUserImageShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[400]!,
+      highlightColor: Colors.grey[300]!,
+      child: Container(
+        height: 75,
+        width: 75,
+        //margin: EdgeInsets.only(top: 50),
+        decoration: BoxDecoration(
+          color: Colors.grey[400],
+          shape: BoxShape.circle,
+        ),
+        //child:
+
+        // Stack(
+        //   children: [
+        //     Padding(
+        //       padding: const EdgeInsets.all(0.0),
+        //       child: Container(
+        //         decoration: BoxDecoration(
+        //           border: Border.all(color: Colors.grey, width: 2.0),
+        //           image: DecorationImage(
+        //             // ImageAssets.likeImage20
+        //               image: NetworkImage(userModel!.imageUrl!),
+        //               fit: BoxFit.cover),
+        //           shape: BoxShape.circle,
+        //         ),
+        //       ),
+        //     ),
+        //     //uploadeIcon
+        //     // InkWell(
+        //     //   onTap: onTap1,
+        //     //   child: Padding(
+        //     //     padding: const EdgeInsets.only(bottom: 4.0),
+        //     //     child: Align(
+        //     //       alignment: Alignment.bottomRight,
+        //     //       child: Container(
+        //     //         height: 20,
+        //     //         width: 20,
+        //     //         decoration: BoxDecoration(
+        //     //           border: Border.all(color: Colors.white, width: 2.0),
+        //     //           color: userModel!.isSelected
+        //     //               ? appYellow
+        //     //               : Colors.grey.shade400,
+        //     //           shape: BoxShape.circle,
+        //     //         ),
+        //     //         child: Padding(
+        //     //           padding: EdgeInsets.all(1.0),
+        //     //           child: Icon(
+        //     //             userModel!.isSelected ? Icons.check : Icons.add,
+        //     //             size: 14,
+        //     //             color:
+        //     //             userModel!.isSelected ? Colors.black : Colors.white,
+        //     //           ),
+        //     //         ),
+        //     //       ),
+        //     //     ),
+        //     //   ),
+        //     // )
+        //   ],
+        // ),
       ),
     );
   }
@@ -188,7 +308,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 border: Border.all(color: Colors.grey, width: 2.0),
                 image: DecorationImage(
                     // ImageAssets.likeImage20
-                    image: AssetImage(userModel!.imageUrl!),
+                    image: NetworkImage(userModel!.imageUrl!),
                     fit: BoxFit.cover),
                 shape: BoxShape.circle,
               ),
@@ -206,7 +326,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   width: 20,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 2.0),
-                    color:  userModel!.isSelected?appYellow:Colors.grey.shade400,
+                    color: userModel!.isSelected
+                        ? appYellow
+                        : Colors.grey.shade400,
                     shape: BoxShape.circle,
                   ),
                   child: Padding(
@@ -214,7 +336,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     child: Icon(
                       userModel!.isSelected ? Icons.check : Icons.add,
                       size: 14,
-                      color: userModel!.isSelected?Colors.black: Colors.white,
+                      color:
+                          userModel!.isSelected ? Colors.black : Colors.white,
                     ),
                   ),
                 ),

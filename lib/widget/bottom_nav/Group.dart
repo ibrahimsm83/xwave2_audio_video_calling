@@ -1,7 +1,9 @@
+import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/view/create_group/create_group_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../resources/myColors.dart';
 import '../../util/assets_manager.dart';
@@ -105,13 +107,11 @@ class _GroupState extends State<Group> {
 
   Widget floatingBtn() {
     return FloatingActionButton(
-      onPressed: () async {
-        // await Permission.contacts.request();
-        // bool b=await Permission.contacts.isGranted;
-        // if(b)
-        //   next_page(Contacts());
-        // next_page(CreateGroupScreen());
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>const CreateGroupScreen()));
+      onPressed: ()  async {
+        await Permission.contacts.request();
+        bool b=await Permission.contacts.isGranted;
+        if(b)
+        next_page(CreateGroupScreen());
       },
       backgroundColor: appYellow,
       child: Icon(

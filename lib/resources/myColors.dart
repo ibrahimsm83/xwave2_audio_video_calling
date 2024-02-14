@@ -10,6 +10,7 @@ Color appSilver=Color(0xff797C7B);
 class AppColor{
 
   //static const Color bgColor=colorWhite;
+  static const Color colorPrimary=appBlack;
   static const Color bgColor=appBlack;
 
   static const Color appBlack=Color(0xff2D2E2F);
@@ -23,5 +24,9 @@ class AppColor{
   static const Color colorTransparent=Colors.transparent;
 
   static const colorShadowGrey=Color(0xFFFBFDFE);
+
+  static const Color colorRed1=Color(0xFFD12C32);
+  static const Color colorGreen1=Color(0xFF3EC732);
+  static const Color colorBlue=Colors.blue;
 
 }

@@ -1,9 +1,9 @@
 import 'dart:convert';
-
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/service/network.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:chat_app_with_myysql/util/helper_functions.dart';
+import 'package:http/http.dart' as http;
 
 class AuthRepository {
   Future<String?> loginUser(
@@ -53,14 +53,41 @@ class AuthRepository {
         var map = jsonDecode(val);
         bool status = map["status"] == Network.STATUS_SUCCESS;
         if (status) {
-            user=User_model.empty(id: map["user_id"], phoneNumber: map["phoneNumber"],
-                profile_completed: !map["newUser"],access_token: map["token"],);
-        //  user = map["otp"];
+            user=User_model.fromJson2(map,access_token: map["token"]);
         }
         AppMessage.showMessage(map["message"].toString());
       },
     );
     return user;
+  }
+
+  Future<User_model?> updateProfile(String phone, String name,String info,
+      {String? image,}) async {
+    User_model? stak;
+    const String url = AppConfig.DIRECTORY + "auth/infoabout";
+    print("updateProfile url: ${url}");
+    final List<http.MultipartFile> files=[];
+
+    final Map<String,String> body={'username':name,
+      'infoAbout':info,
+      'phoneNumber':phone,};
+    print("updateProfile body: ${body}");
+
+    if (image != null) {
+      files.add(await http.MultipartFile.fromPath("avatar", image));
+    }
+    await Network().multipartPost(url, body,
+        //headers: {"Authorization": "Bearer ${token}",},
+        files: files,onSuccess: (val){
+          print("updateProfile response: ${val}");
+          var map=jsonDecode(val);
+          if(map["status"]==Network.STATUS_SUCCESS){
+            var us=map["userData"];
+            stak=User_model.fromJson2(us,access_token: map["token"]);
+          }
+          AppMessage.showMessage(map["message"]);
+        });
+    return stak;
   }
 
 }

@@ -56,10 +56,12 @@ dependencies:
 
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
 
 
   agora_rtc_engine: ^6.2.2
   agora_token_service: ^0.1.2
+
 
 
 dev_dependencies:

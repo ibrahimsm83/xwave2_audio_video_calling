@@ -33,10 +33,11 @@ class CircularButton extends StatelessWidget {
   final BorderSide border;
   final double elevation;
   final double ratio;
+  final bool isSvg;
   const CircularButton({
     Key? key,
     required this.diameter,
-    required this.icon,
+    required this.icon,this.isSvg=true,
     this.bgColor = AppColor.colorWhite,
     this.elevation = 0,
     this.ratio = 0.4,
@@ -69,6 +70,7 @@ class CircularButton extends StatelessWidget {
       size: diameter * ratio,
       icon: icon!,
       color: color,
+      isSvg: isSvg,
     ):Container();
   }
 }

@@ -135,7 +135,9 @@ class _MessagesState extends State<Messages> {
       bool b=await Permission.contacts.isGranted;
       if(b)
       next_page(Contacts());
-    },backgroundColor: appYellow,child: Icon(CupertinoIcons.add,color: Colors.white,),);
+    },
+
+      backgroundColor: appYellow,child: Icon(CupertinoIcons.add,color: Colors.white,),);
   }
 
   @override
@@ -253,7 +255,6 @@ class _MessagesState extends State<Messages> {
 
   @override
   void dispose() {
-
     unregisterEvent('chatListUpdate');
     super.dispose();
   }

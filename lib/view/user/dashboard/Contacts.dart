@@ -112,7 +112,6 @@ class _ContactsState extends State<Contacts> {
                       child: ListTile(
                         onTap: () async{
                           startChat(model.id);
-            
                         },
                         leading: my_profile_container(img: model.avatar),
                         title: myText(text: model.username,size: 18,fontWeight: FontWeight.w500,),
