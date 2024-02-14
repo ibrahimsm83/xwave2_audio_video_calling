@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../resources/myColors.dart';
 import '../../util/assets_manager.dart';
@@ -85,18 +86,93 @@ class _GroupState extends State<Group> {
                     itemCount: 15,
                     itemBuilder: (context, index) {
                       return InkWell(
-                          onTap: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) => InnerChat(
-                            //           image: storiesprofile[index],
-                            //           name: storiesname[index],
-                            //         )));
-                          },
-                          child: chatUser(
-                              "TeamAlign", ImageAssets.kDemoUserImage));
+                        onTap: () {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => InnerChat(
+                          //           image: storiesprofile[index],
+                          //           name: storiesname[index],
+                          //         )));
+                        },
+                        child: buildUserShimmer(),
+
+                        // chatUser(
+                        //     "TeamAlign", ImageAssets.kDemoUserImage)
+                      );
                     }),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildUserShimmer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Shimmer.fromColors(
+                  baseColor: Colors.grey[400]!,
+                  highlightColor: Colors.grey[300]!,
+                  child:
+                  Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        shape: BoxShape.circle,
+                      ))
+
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Shimmer.fromColors(
+                      baseColor: Colors.grey[400]!,
+                      highlightColor: Colors.grey[300]!,
+                      child: Container(
+                          height: 10,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                          ))),
+                  SizedBox(height: 10.0),
+                  Shimmer.fromColors(
+                      baseColor: Colors.grey[400]!,
+                      highlightColor: Colors.grey[300]!,
+                      child: Container(
+                          height: 10,
+                          width: 200,
+                          //width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            //shape: BoxShape.circle,
+                          ))),
+                ],
+              ),
+              const SizedBox(width: 5.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child:  Shimmer.fromColors(
+                    baseColor: Colors.grey[400]!,
+                    highlightColor: Colors.grey[300]!,
+                    child: Container(
+                        height: 10,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                        )),
+                ),
               ),
             ],
           ),
@@ -107,11 +183,10 @@ class _GroupState extends State<Group> {
 
   Widget floatingBtn() {
     return FloatingActionButton(
-      onPressed: ()  async {
+      onPressed: () async {
         await Permission.contacts.request();
-        bool b=await Permission.contacts.isGranted;
-        if(b)
-        next_page(CreateGroupScreen());
+        bool b = await Permission.contacts.isGranted;
+        if (b) next_page(CreateGroupScreen());
       },
       backgroundColor: appYellow,
       child: Icon(
@@ -142,8 +217,10 @@ class _GroupState extends State<Group> {
                 children: [
                   Text(
                     name!,
-                    style: TextStyle(fontSize: 15, color: Colors.black,
-                    fontFamily: "Roboto",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                      fontFamily: "Roboto",
                     ),
                   ),
                   Text(
@@ -155,7 +232,10 @@ class _GroupState extends State<Group> {
               const SizedBox(width: 5.0),
               Padding(
                 padding: const EdgeInsets.only(right: 10.0),
-                child: Text("8:00 AM", style: TextStyle(color: Colors.grey, )),
+                child: Text("8:00 AM",
+                    style: TextStyle(
+                      color: Colors.grey,
+                    )),
               ),
             ],
           ),
