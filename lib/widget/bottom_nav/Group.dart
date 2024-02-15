@@ -1,11 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app_with_myysql/controller/user/group_chat_controller.dart';
+import 'package:chat_app_with_myysql/model/group_chat_users_model.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/view/create_group/create_group_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../resources/myColors.dart';
 import '../../util/assets_manager.dart';
 
@@ -17,6 +21,14 @@ class Group extends StatefulWidget {
 }
 
 class _GroupState extends State<Group> {
+  final GroupChatController apiController = Get.put(GroupChatController());
+
+  @override
+  void initState() {
+    apiController.loadChatGroupsApi();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,30 +89,33 @@ class _GroupState extends State<Group> {
                   ),
                 ),
               ),
-              Expanded(
-                child: ListView.separated(
-                    padding: EdgeInsets.zero,
-                    separatorBuilder: ((context, index) => SizedBox(
-                          height: 10.0,
-                        )),
-                    itemCount: 15,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => InnerChat(
-                          //           image: storiesprofile[index],
-                          //           name: storiesname[index],
-                          //         )));
-                        },
-                        child: buildUserShimmer(),
-
-                        // chatUser(
-                        //     "TeamAlign", ImageAssets.kDemoUserImage)
-                      );
-                    }),
+              Obx(
+                () => Expanded(
+                  child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      separatorBuilder: ((context, index) => const SizedBox(
+                            height: 10.0,
+                          )),
+                      itemCount: apiController.isLoading.value
+                          ? 8
+                          : apiController.groupsChatList.length,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                            onTap: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InnerChat(
+                              //           image: storiesprofile[index],
+                              //           name: storiesname[index],
+                              //         )));
+                            },
+                            child: apiController.isLoading.value
+                                ? buildUserShimmer()
+                                : chatUser(
+                                    apiController.groupsChatList[index]));
+                      }),
+                ),
               ),
             ],
           ),
@@ -124,16 +139,13 @@ class _GroupState extends State<Group> {
               Shimmer.fromColors(
                   baseColor: Colors.grey[400]!,
                   highlightColor: Colors.grey[300]!,
-                  child:
-                  Container(
+                  child: Container(
                       height: 60,
                       width: 60,
                       decoration: BoxDecoration(
                         color: Colors.grey[400],
                         shape: BoxShape.circle,
-                      ))
-
-              ),
+                      ))),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -163,15 +175,15 @@ class _GroupState extends State<Group> {
               const SizedBox(width: 5.0),
               Padding(
                 padding: const EdgeInsets.only(right: 10.0),
-                child:  Shimmer.fromColors(
-                    baseColor: Colors.grey[400]!,
-                    highlightColor: Colors.grey[300]!,
-                    child: Container(
-                        height: 10,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                        )),
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey[400]!,
+                  highlightColor: Colors.grey[300]!,
+                  child: Container(
+                      height: 10,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                      )),
                 ),
               ),
             ],
@@ -196,7 +208,8 @@ class _GroupState extends State<Group> {
     );
   }
 
-  Widget chatUser(String? name, String? img) {
+  Widget chatUser(GroupChatUsersModel groupModel) {
+    DateTime dateTime = DateTime.parse(groupModel.createdAt);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Container(
@@ -209,22 +222,39 @@ class _GroupState extends State<Group> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CircleAvatar(
-                radius: 30.0,
-                backgroundImage: AssetImage(img!),
+                radius: 28.0,
+                backgroundColor: AppColor.appYellow,
+                child: CachedNetworkImage(
+                  fit: BoxFit.contain,
+                  imageUrl: groupModel.groupAvatar,
+                  imageBuilder:(context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                    ),
+                    ),
+                  ) ,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      CircularProgressIndicator(value: downloadProgress.progress),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    name!,
+                    groupModel.chatName ?? "",
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
                       fontFamily: "Roboto",
                     ),
                   ),
-                  Text(
-                    "Hey, I was wondering if you could…",
+                 const Text(
+                    "Don’t miss to attend the meeting.",
+                    //"Participants ${groupModel.userCount}",
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -232,10 +262,28 @@ class _GroupState extends State<Group> {
               const SizedBox(width: 5.0),
               Padding(
                 padding: const EdgeInsets.only(right: 10.0),
-                child: Text("8:00 AM",
-                    style: TextStyle(
-                      color: Colors.grey,
-                    )),
+                child: Column(
+                  children: [
+                    Text(DateFormat('HH:mm').format(dateTime),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontFamily: "Roboto",
+                        )),
+                    Container(
+                      decoration:const BoxDecoration(
+                        color: AppColor.appYellow,
+                        shape: BoxShape.circle,
+                      ),
+                      child:Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(groupModel.userCount.toString(),style:const TextStyle(
+                          color: Colors.white,
+                          fontFamily: "Roboto",
+                        )),
+                      )
+                    )
+                  ],
+                ),
               ),
             ],
           ),

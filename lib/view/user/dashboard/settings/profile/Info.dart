@@ -41,7 +41,9 @@ class _InfoState extends State<Info> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(children: [
+      body: Stack(
+
+        children: [
 
         Container(
             width: Get.width,height: Get.height,
@@ -54,16 +56,13 @@ class _InfoState extends State<Info> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
            Center(
              child: InkWell(
                onTap: () async{
                  XFile? xfile=await ImagePicker().pickImage(source: ImageSource.gallery);
-
                  if(xfile!=null){
                    img=File(xfile.path);
                    setState(() {
-
                    });
                  }
 
@@ -88,7 +87,7 @@ class _InfoState extends State<Info> {
               child: my_input(controler: info, label: 'Your Info'),
             ),
 
-            SizedBox(height: 30,),
+           const SizedBox(height: 30,),
             myBtn(text: 'Upload', color: appYellow, gestureDetector: GestureDetector(onTap: () async{
 
               authController.completeProfile(widget.nbr, name.text, info.text, img);

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/page_model.dart';
 import 'package:chat_app_with_myysql/service/contact_service.dart';
@@ -20,6 +22,9 @@ final Rx<bool> isLoading=false.obs;
   }
 
   Future<void> loadApiContacts() async {
+if(this.users.value.data !=null){
+  this.users.value = PageModel();
+}
     isLoading.value=true;
     final List<Map<String, String>> map = [];
     List<User_model> users =
@@ -33,6 +38,8 @@ final Rx<bool> isLoading=false.obs;
     final String token = await getToken_praf();
     await contactRepository.getApiContacts(token, map).then((list) {
       if (list != null) {
+        print("-------ibrahim-------");
+        print("--------myList of string------$list");
         this.users.value = list;
       }
     });

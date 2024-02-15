@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:chat_app_with_myysql/controller/user/controller.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/create_group_user_model.dart';
@@ -6,7 +7,9 @@ import 'package:chat_app_with_myysql/util/assets_manager.dart';
 import 'package:chat_app_with_myysql/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../controller/user/group_chat_controller.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({Key? key}) : super(key: key);
@@ -17,53 +20,23 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final ContactController contactController = Get.find<ContactController>();
+  final GroupChatController groupChatController = Get.find<GroupChatController>();
   List<User_model>? contactList;
   List<String> userIdsList = [];
-  List<CreateGroupUserModel> userList = [
-    // CreateGroupUserModel(
-    //     id: "0", name: "ali", isSelected: false, imageUrl: ImageAssets.person1),
-    // CreateGroupUserModel(
-    //     id: "1",
-    //     name: "kashif",
-    //     isSelected: false,
-    //     imageUrl: ImageAssets.person2),
-    // CreateGroupUserModel(
-    //     id: "2",
-    //     name: "jhon",
-    //     isSelected: false,
-    //     imageUrl: ImageAssets.person3),
-    // CreateGroupUserModel(
-    //     id: "3",
-    //     name: "smith",
-    //     isSelected: false,
-    //     imageUrl: ImageAssets.person4),
-    // CreateGroupUserModel(
-    //     id: "4", name: "tom", isSelected: false, imageUrl: ImageAssets.person5),
-    // CreateGroupUserModel(
-    //     id: "5",
-    //     name: "james",
-    //     isSelected: false,
-    //     imageUrl: ImageAssets.person6),
-    // CreateGroupUserModel(
-    //     id: "6",
-    //     name: "wick",
-    //     isSelected: false,
-    //     imageUrl: ImageAssets.person7),
-  ];
+  List<CreateGroupUserModel> userList = [];
+  File? img;
 
   @override
   void initState() {
-    contactController.loadApiContacts();
-    contactList = contactController.users.value.data;
     loadData();
-    print(contactList);
-    print("--------2--------------");
     super.initState();
   }
 
   final _groupNameController = TextEditingController();
+  void loadData() async {
+   await contactController.loadApiContacts();
+    contactList = contactController.users.value.data;
 
-  void loadData() {
     if (contactList != null) {
       for (int i = 0; i < contactList!.length; i++) {
         userList.add(CreateGroupUserModel(
@@ -72,6 +45,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             isSelected: false,
             imageUrl: contactList![i].avatar));
       }
+    }else{
+      print("contact list is empty");
     }
   }
 
@@ -103,9 +78,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
-            child: IconButton(onPressed: (){
-              contactController.loadApiContacts();
-              contactList = contactController.users.value.data;
+            child: IconButton(
+                onPressed: () {
+              userList=[];
+              contactList=[];
               loadData();
             }, icon: Icon(Icons.refresh,color: AppColor.appYellow,)),
           ),
@@ -156,7 +132,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  "Members",
+                  "Select Group Image",
                   style: TextStyle(
                       color: Colors.grey,
                       fontSize: 14,
@@ -164,13 +140,44 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       fontWeight: FontWeight.w500),
                 ),
               ),
+
+              ///Select Group Image
+              Center(
+                child: InkWell(
+                  onTap: () async{
+                    XFile? xfile=await ImagePicker().pickImage(source: ImageSource.gallery);
+                    if(xfile!=null){
+                      img=File(xfile.path);
+                      setState(() {
+                      });
+                    }
+
+                  },
+                  child: Container(
+                    width: 100,height: 100,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey),
+                        image: img==null?DecorationImage(image: AssetImage('images/Group 468.png'),):
+                        DecorationImage(image: FileImage(img!),fit: BoxFit.cover)
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "App Members",
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
+
               Obx(() {
-                print(
-                    "--obx is Loading----${contactController.isLoading.value}");
-                // else {
-                print("------------");
-                print(userList);
-                return Container(
+                return SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Wrap(
                     alignment: WrapAlignment.start,
@@ -191,8 +198,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                 userList[index].isSelected = true;
                                 userIdsList.add(userList[index].id);
                               }
-                              print("UserIdList-----------");
-                              print(userIdsList);
                               setState(() {});
                             });
                       }
@@ -209,9 +214,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     color: appYellow,
                     context: context,
                     onTap: () {
-                      if (_groupNameController.text.isNotEmpty) {
+
+                      if (img == null) {
+                        Get.snackbar('Error', 'Select image');
+                        return;
+                      }
+                      if (_groupNameController.text.isNotEmpty && userIdsList.isNotEmpty) {
+                        groupChatController.createChatGroupsApi(groupName: _groupNameController.text.trim(),usersList: userIdsList,imageFile: img!);
                       } else {
-                        Get.snackbar('Error', 'Enter Group Name',
+                        Get.snackbar('Error', 'Enter Group Name or Select Users',
                             backgroundColor: Colors.red);
                       }
                       //Navigator.pushNamed(context, CustomRouteNames.kWorkingHourScreenRoute);
@@ -236,55 +247,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           color: Colors.grey[400],
           shape: BoxShape.circle,
         ),
-        //child:
-
-        // Stack(
-        //   children: [
-        //     Padding(
-        //       padding: const EdgeInsets.all(0.0),
-        //       child: Container(
-        //         decoration: BoxDecoration(
-        //           border: Border.all(color: Colors.grey, width: 2.0),
-        //           image: DecorationImage(
-        //             // ImageAssets.likeImage20
-        //               image: NetworkImage(userModel!.imageUrl!),
-        //               fit: BoxFit.cover),
-        //           shape: BoxShape.circle,
-        //         ),
-        //       ),
-        //     ),
-        //     //uploadeIcon
-        //     // InkWell(
-        //     //   onTap: onTap1,
-        //     //   child: Padding(
-        //     //     padding: const EdgeInsets.only(bottom: 4.0),
-        //     //     child: Align(
-        //     //       alignment: Alignment.bottomRight,
-        //     //       child: Container(
-        //     //         height: 20,
-        //     //         width: 20,
-        //     //         decoration: BoxDecoration(
-        //     //           border: Border.all(color: Colors.white, width: 2.0),
-        //     //           color: userModel!.isSelected
-        //     //               ? appYellow
-        //     //               : Colors.grey.shade400,
-        //     //           shape: BoxShape.circle,
-        //     //         ),
-        //     //         child: Padding(
-        //     //           padding: EdgeInsets.all(1.0),
-        //     //           child: Icon(
-        //     //             userModel!.isSelected ? Icons.check : Icons.add,
-        //     //             size: 14,
-        //     //             color:
-        //     //             userModel!.isSelected ? Colors.black : Colors.white,
-        //     //           ),
-        //     //         ),
-        //     //       ),
-        //     //     ),
-        //     //   ),
-        //     // )
-        //   ],
-        // ),
       ),
     );
   }
@@ -295,7 +257,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       height: 75,
       width: 75,
       //margin: EdgeInsets.only(top: 50),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.yellow,
         shape: BoxShape.circle,
       ),
@@ -307,13 +269,31 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey, width: 2.0),
                 image: DecorationImage(
-                    // ImageAssets.likeImage20
+                  // ImageAssets.likeImage20
                     image: NetworkImage(userModel!.imageUrl!),
                     fit: BoxFit.cover),
                 shape: BoxShape.circle,
               ),
             ),
           ),
+
+          // CachedNetworkImage(
+          //   fit: BoxFit.contain,
+          //   imageUrl: userModel!.imageUrl!,
+          //   imageBuilder:(context, imageProvider) => Container(
+          //     decoration: BoxDecoration(
+          //       shape: BoxShape.circle,
+          //       border: Border.all(color: Colors.grey, width: 2.0),
+          //       image: DecorationImage(
+          //         image: imageProvider,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ) ,
+          //   progressIndicatorBuilder: (context, url, downloadProgress) =>
+          //       CircularProgressIndicator(value: downloadProgress.progress),
+          //   errorWidget: (context, url, error) => const Icon(Icons.error),
+          // ),
           //uploadeIcon
           InkWell(
             onTap: onTap1,
