@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../resources/myColors.dart';
 import '../../util/assets_manager.dart';
+import '../../view/group_chat_screen/group_chat_screen.dart';
 
 class Group extends StatefulWidget {
   const Group({super.key});
@@ -103,12 +104,19 @@ class _GroupState extends State<Group> {
                         return InkWell(
                             onTap: () {
                               // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => InnerChat(
-                              //           image: storiesprofile[index],
-                              //           name: storiesname[index],
-                              //         )));
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) =>
+                              next_page(
+                                GroupChatScreen(
+                                  groupImage: apiController
+                                      .groupsChatList[index].groupAvatar,
+                                  title: apiController
+                                      .groupsChatList[index].chatName,
+                                  userCount: apiController
+                                      .groupsChatList[index].userCount.toString(),
+                                ),
+                              );
                             },
                             child: apiController.isLoading.value
                                 ? buildUserShimmer()
@@ -227,17 +235,18 @@ class _GroupState extends State<Group> {
                 child: CachedNetworkImage(
                   fit: BoxFit.contain,
                   imageUrl: groupModel.groupAvatar,
-                  imageBuilder:(context, imageProvider) => Container(
+                  imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    ),
-                  ) ,
+                  ),
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      CircularProgressIndicator(value: downloadProgress.progress),
+                      CircularProgressIndicator(
+                          value: downloadProgress.progress),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
@@ -252,7 +261,7 @@ class _GroupState extends State<Group> {
                       fontFamily: "Roboto",
                     ),
                   ),
-                 const Text(
+                  const Text(
                     "Don’t miss to attend the meeting.",
                     //"Participants ${groupModel.userCount}",
                     style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -270,18 +279,18 @@ class _GroupState extends State<Group> {
                           fontFamily: "Roboto",
                         )),
                     Container(
-                      decoration:const BoxDecoration(
-                        color: AppColor.appYellow,
-                        shape: BoxShape.circle,
-                      ),
-                      child:Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(groupModel.userCount.toString(),style:const TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Roboto",
-                        )),
-                      )
-                    )
+                        decoration: const BoxDecoration(
+                          color: AppColor.appYellow,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(groupModel.userCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Roboto",
+                              )),
+                        ))
                   ],
                 ),
               ),

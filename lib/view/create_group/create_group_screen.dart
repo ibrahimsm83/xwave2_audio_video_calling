@@ -61,7 +61,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Create Group",
           style: TextStyle(
               fontSize: 16, fontFamily: "Roboto", fontWeight: FontWeight.w500),
@@ -70,7 +70,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           padding: const EdgeInsets.all(20.0),
           child: InkWell(
               onTap: () => Navigator.of(context).pop(),
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_back,
                 color: Colors.yellow,
               )),
