@@ -56,29 +56,6 @@ class _OneToOneChatState extends State<OneToOneChat> {
 
    @override
    void initState() {
-     //
-     // audioPlayer.onDurationChanged.listen((Duration duration) {
-     //   setState(() {
-     //     _duration = duration;
-     //   });
-     //   print("listner-----onDurationChanged-");
-     // });
-
-
-     // // Set up listeners for player state changes
-     // audioPlayer.onPlayerStateChanged.listen((state) {
-     //   setState(() {
-     //     playerState = state;
-     //   });
-     // });
-     //
-     // audioPlayer.onPositionChanged.listen((Duration position) {
-     //   setState(() {
-     //     _position = position;
-     //
-     //   });
-     //   print("listner-----onPositionChanged-");
-     // });
 
      super.initState();
      valuesPrint();
@@ -104,19 +81,11 @@ class _OneToOneChatState extends State<OneToOneChat> {
 
          // can add extension like ".mp4" ".wav" ".m4a" ".aac"
          customPath = appDocDirectory.path + customPath + DateTime.now().millisecondsSinceEpoch.toString();
-
-         // .wav <---> AudioFormat.WAV
-         // .mp4 .m4a .aac <---> AudioFormat.AAC
-         // AudioFormat is optional, if given value, will overwrite path extension when there is conflicts.
          _recorder = AnotherAudioRecorder(customPath, audioFormat: AudioFormat.WAV);
 
          await _recorder?.initialized;
          // after initialization
          var current = await _recorder?.current(channel: 0);
-         print("-------recorder initilized...");
-         print("-------Custom path--...$customPath");
-         print("-------current path--...$current");
-
          // should be "Initialized", if all working fine
          setState(() {
            _current = current;

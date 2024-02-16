@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
+import 'package:chat_app_with_myysql/model/group_messages_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
@@ -13,14 +14,14 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
-class ChatController extends GetxController {
+class GroupMessageController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isMessageLoading = false.obs;
   RxBool isMicTapped = false.obs;
   ScrollController scrollController = ScrollController();
   TextEditingController messageController = TextEditingController();
   ApiService apiService = ApiService();
-  RxList<ChatModel> chatList = <ChatModel>[].obs;
+  RxList<GroupMessages> groupChatList = <GroupMessages>[].obs;
 
   ///Sender User
   final Rx<User_model> _senderUser =
@@ -47,59 +48,76 @@ class ChatController extends GetxController {
 
   fetchChat(String receiverId) async {
     print('-----set users----');
-    chatList.value = [];
+    groupChatList.value = [];
     //isLoading.value = true;
     EasyLoading.show();
-    var response = await apiService.getApiWithToken(fetch1To1chat + receiverId);
+    var response = await apiService.getApiWithToken(fetcAllMessagesOfParticularGroupChat + receiverId);
     print(response.body);
     EasyLoading.dismiss();
     //isLoading.value = false;
 
     if (response.statusCode == 200) {
+      print("fetch group messages 1----------");
       var map=jsonDecode(response.body);
-      List<dynamic> list = map;
+      print("fetch group messages 2----------${map}");
+      List<dynamic> list = map['groupMessages'];
+      print("fetch group messages 2----------${list}");
+      if(list.isEmpty)return;
 
-      list.forEach((element) {
-        String contant = '';
-        String mediaType = '';
-        String url = '';
-        String lati = '',
-            longi = '';
-        String time = '';
+      for(int i=0;i<list.length;i++){
+        groupChatList.add(
+            GroupMessages.fromJson(list[i]));
+      }
 
-        User_model sender = User_model.fromJson(element['sender']);
-        User_model receiver = User_model.fromJson(element['receiver']);
-
-        time = element['createdAt'];
-
-        if (element['location'] != null) {
-          lati = element['location']['latitude'].toString();
-          longi = element['location']['longitude'].toString();
-        }
-
-        if (element['content'] != null) {
-          contant = element['content'];
-        }
-        mediaType = element['media']['type'];
-        if (element['media']['url'] != null) {
-          url = element['media']['url'];
-        }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time: time,
-            sender: sender,
-            receiver: receiver));
-      });
+    /*
+fetch group messages 2----------{groupMessages: [{media: {type: none}, _id: 65cf43d7ecf7665e74b54ba6, sender: {_id: 65c1fca8ae0a9c73d6fb6827, phoneNumber: +923123123123, username: testingP3User}, chat: 65cf3896ecf7665e74b54b66, chatType: group, content: hi all, deliveryStatus: sent, createdAt: 2024-02-16T11:15:35.043Z, updatedAt: 2024-02-16T11:15:35.043Z, __v: 0}], groupUpdatedAt: 2024-02-16T10:27:34.571Z}
+I/flutter (32409): fetch group messages 2----------[{media: {type: none}, _id: 65cf43d7ecf7665e74b54ba6, sender: {_id: 65c1fca8ae0a9c73d6fb6827, phoneNumber: +923123123123, username: testingP3User}, chat: 65cf3896ecf7665e74b54b66, chatType: group, content: hi all, deliveryStatus: sent, createdAt: 2024-02-16T11:15:35.043Z, updatedAt: 2024-02-16T11:15:35.043Z, __v: 0}]
+*/
+      // list.forEach((element) {
+      //   String contant = '';
+      //   String mediaType = '';
+      //   String url = '';
+      //   String lati = '',
+      //       longi = '';
+      //   String time = '';
+      //
+      //   User_model sender = User_model.fromJson(element['sender']);
+      //   User_model receiver = User_model.fromJson(element['receiver']);
+      //
+      //   time = element['createdAt'];
+      //
+      //   if (element['location'] != null) {
+      //     lati = element['location']['latitude'].toString();
+      //     longi = element['location']['longitude'].toString();
+      //   }
+      //
+      //   if (element['content'] != null) {
+      //     contant = element['content'];
+      //   }
+      //   mediaType = element['media']['type'];
+      //   if (element['media']['url'] != null) {
+      //     url = element['media']['url'];
+      //   }
+      //   groupChatList.add(
+      //       GroupMessages.fromJson(json)
+      //       // ChatModel(
+      //       // content: contant,
+      //       // mediaType: mediaType,
+      //       // url: url,
+      //       // lati: lati,
+      //       // longi: longi,
+      //       // time: time,
+      //       // sender: sender,
+      //       // receiver: receiver)
+      //
+      //   );
+      // });
 
       scrolList(scrollController);
     }
   }
 
-  sendTextMSg(String receiverId, User_model senderM, User_model receiverM,
+  sendTextMSg(String receiverId,
       {bool isImage = false, bool isVoice = false, String? voiceFile, bool isVideo = false, String? videoPath}) async {
     if (isImage == true) {
       final imageFile = await ImagePicker().pickImage(
@@ -113,7 +131,7 @@ class ChatController extends GetxController {
           'receiver': receiverId, //:widget.receiver.id,
           'content': messageController.text,
           'mediaType': 'image',
-         // 'media': MultipartFile(File(imageFile.path), filename: fileName),
+          // 'media': MultipartFile(File(imageFile.path), filename: fileName),
         };
         print("---map--------$map");
         print("---imageFile.path--------${imageFile.path}");
@@ -171,15 +189,15 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         if (map1['message']['media']['url'] != null) {
           url = map1['message']['media']['url'];
         }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time: time,
-            sender: senderUser,
-            receiver: receiverUser));
+        // chatList.add(ChatModel(
+        //     content: contant,
+        //     mediaType: mediaType,
+        //     url: url,
+        //     lati: lati,
+        //     longi: longi,
+        //     time: time,
+        //     sender: senderUser,
+        //     receiver: receiverUser));
         scrolList(scrollController);
       }
     }
@@ -204,7 +222,7 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
           'mediaType': 'audio',
           //'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
           // 'media': MultipartFile(File('/storage/emulated/0/Download/file_example_WAV_2MG.wav'),filename: fileName),
-         // 'media': MultipartFile(File(voiceFile), filename: fileName),
+          // 'media': MultipartFile(File(voiceFile), filename: fileName),
         };
         print("---map--------${map}");
         print("---imageFile.path--------${voiceFile}");
@@ -255,17 +273,17 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         if (map1['message']['media']['url'] != null) {
           url = map1['message']['media']['url'];
         }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time: time,
-            sender: senderUser,
-            receiver: receiverUser));
+        // chatList.add(ChatModel(
+        //     content: contant,
+        //     mediaType: mediaType,
+        //     url: url,
+        //     lati: lati,
+        //     longi: longi,
+        //     time: time,
+        //     sender: senderUser,
+        //     receiver: receiverUser));
         print("-------------");
-        print(chatList);
+        // print(chatList);
         scrolList(scrollController);
       }
     }
@@ -345,15 +363,18 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
      */
     }
 
-
+     print(receiverId);
+    print(messageController.text);
+    print("-----------------");
     if (messageController.text.isEmpty) return;
     Map<String, String> map = {
-      'receiver': receiverId, //:widget.receiver.id,
+      'groupId': receiverId, //:widget.receiver.id,
       'content': messageController.text,
     };
     isLoading.value = true;
     var response = await apiService
-        .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
+        .postApiWithFromDataAndHeaderAndContantType(sendMessageInGroupMsg, map);
+
     isLoading.value = false;
 
     if (response.statusCode != 200) return;
@@ -372,7 +393,15 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
     String time = '';
     Stream stream = response.stream.transform(const Utf8Decoder());
     String body = await stream.first;
+    print("Send Messages Response----33${stream}");
+    // print(response);
+    print("Send Messages Response----44${body}");
+
     var map1=jsonDecode(body);
+    print("Send Messages Response----45${map1}");
+
+    // groupChatList.add(GroupMessages(media:Media.fromJson(map1['media']),sId:map1['_id'],sender:   ))
+
     time = map1['message']['chat']['updatedAt'];
     if (map1['message']['location'] != null) {
       if (map1['message']['location']['latitude'] != null) {
@@ -387,19 +416,20 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
     if (map1['message']['media']['url'] != null) {
       url = map1['message']['media']['url'];
     }
-    chatList.add(ChatModel(
-        content: contant,
-        mediaType: mediaType,
-        url: url,
-        lati: lati,
-        longi: longi,
-        time: time,
-        sender: senderUser,
-        receiver: receiverUser));
+    // chatList.add(ChatModel(
+    //     content: contant,
+    //     mediaType: mediaType,
+    //     url: url,
+    //     lati: lati,
+    //     longi: longi,
+    //     time: time,
+    //     sender: senderUser,
+    //     receiver: receiverUser));
     scrolList(scrollController);
   }
 
   msgListner(dynamic newMessage) async {
+    print("========myGroupChatListner---------");
     print('msg - ' + newMessage.toString());
 
     String contant = '';
@@ -436,17 +466,17 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
     }
     print("listener is running -----");
     // chatList.add(ChatModel(content: contant, mediaType: mediaType, url: url, lati: lati, longi: longi, time: time, sender:senderUser , receiver: receiverUser));
-    chatList.add(ChatModel(
-        content: contant,
-        mediaType: mediaType,
-        url: url,
-        lati: lati,
-        longi: longi,
-        time: time,
-        sender:
-        User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
-        receiver: User_model(
-            id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
+    // chatList.add(ChatModel(
+    //     content: contant,
+    //     mediaType: mediaType,
+    //     url: url,
+    //     lati: lati,
+    //     longi: longi,
+    //     time: time,
+    //     sender:
+    //     User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
+    //     receiver: User_model(
+    //         id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
 
     print("lisntneeeeeeee");
     print(senderUser.id);
@@ -485,11 +515,11 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
       dynamic data = jsonDecode(await response.stream.bytesToString());
       // String responseBody = await utf8.decode(response.bodyBytes);
       print("---------my chat response------2-----");
-       print(data['message']);
+      print(data['message']);
       print(data['message']['media']['type']);
-       print(data['message']['media']['url']);
+      print(data['message']['media']['url']);
 
-          //print(apiRes);
+      //print(apiRes);
 
 
       //
@@ -515,17 +545,17 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
       if (data['message']['media']['url'] != null) {
         url = data['message']['media']['url'];
       }
-      chatList.add(ChatModel(
-          content: contant,
-          mediaType: mediaType,
-          url: url,
-          lati: lati,
-          longi: longi,
-          time: time,
-          sender: senderUser,
-          receiver: receiverUser));
-      print("-------------");
-      print(chatList);
+      // chatList.add(ChatModel(
+      //     content: contant,
+      //     mediaType: mediaType,
+      //     url: url,
+      //     lati: lati,
+      //     longi: longi,
+      //     time: time,
+      //     sender: senderUser,
+      //     receiver: receiverUser));
+      // print("-------------");
+      // print(chatList);
       scrolList(scrollController);
     }
     else {

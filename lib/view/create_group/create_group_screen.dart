@@ -1,11 +1,16 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_with_myysql/controller/user/controller.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/create_group_user_model.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/assets_manager.dart';
+import 'package:chat_app_with_myysql/util/sizer.dart';
+import 'package:chat_app_with_myysql/widget/common.dart';
 import 'package:chat_app_with_myysql/widget/custom_button.dart';
+import 'package:chat_app_with_myysql/widget/profile_items.dart';
 import 'package:flutter/material.dart';
+import 'package:chat_app_with_myysql/util/sizer.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shimmer/shimmer.dart';
@@ -21,6 +26,7 @@ class CreateGroupScreen extends StatefulWidget {
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final ContactController contactController = Get.find<ContactController>();
   final GroupChatController groupChatController = Get.find<GroupChatController>();
+  final DashboardController dashboardController = Get.find<DashboardController>();
   List<User_model>? contactList;
   List<String> userIdsList = [];
   List<CreateGroupUserModel> userList = [];
@@ -401,13 +407,30 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   Widget groupAdminWidget() {
-    return const ListTile(
+    return  ListTile(
       leading: CircleAvatar(
-        radius: 30.0,
-        backgroundImage: AssetImage(ImageAssets.kDemoUserImage),
+        radius: 28.0,
+        backgroundColor: AppColor.appYellow,
+        child: CachedNetworkImage(
+          fit: BoxFit.contain,
+          imageUrl: dashboardController.user_model!.avatar,
+          imageBuilder: (context, imageProvider) => Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              CircularProgressIndicator(
+                  value: downloadProgress.progress),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        ),
       ),
       title: Text(
-        "Rashid Khan",
+          dashboardController.user_model!.username,
         style: TextStyle(
           fontSize: 15,
           color: Colors.black,

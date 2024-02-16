@@ -115,6 +115,9 @@ class _GroupState extends State<Group> {
                                       .groupsChatList[index].chatName,
                                   userCount: apiController
                                       .groupsChatList[index].userCount.toString(),
+                                  groupId: apiController
+                                      .groupsChatList[index].id,
+
                                 ),
                               );
                             },
