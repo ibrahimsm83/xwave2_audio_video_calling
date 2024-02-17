@@ -58,7 +58,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   void initState() {
     super.initState();
     // valuesPrint();
-    registerEvent('new-group-chat', groupChatController.msgListner);
+    registerEvent('groupMessages', groupChatController.msgListner);
     //registerEvent('new-message',groupChatController.msgListner);
     _init();
     groupChatController.fetchChat(widget.groupId!);
@@ -66,7 +66,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   @override
   void dispose() {
-    unregisterEvent('new-group-chat');
+    unregisterEvent('groupMessages');
+    //unregisterEvent('new-group-chat');
     // audioPlayer.dispose();
     super.dispose();
   }
@@ -231,8 +232,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
           child: IconButton(
               onPressed: () {
-                print("group id");
-                groupChatController.sendTextMSg(widget.groupId!);
+                groupChatController.sendMessageApi(widget.groupId!);
               },
               icon: Icon(
                 Icons.send,
@@ -260,10 +260,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 if (_currentStatus != RecordingStatus.Unset) {
                   // _stop();
                   var result = await _recorder?.stop();
-                  print("----------current path --1");
-                  print(result?.path);
-                  print("----------current path --2");
-                  //groupChatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isVoice: true,voiceFile: result?.path);
+                  groupChatController.sendMessageApi(widget.groupId!,isVoice: true,voiceFile: result?.path);
                   groupChatController.isMicTapped.value = false;
                 } else {
                   null;
@@ -304,7 +301,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             ),
             InkWell(
               onTap: () {
-                //groupChatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isImage: true);
+                groupChatController.sendMessageApi(widget.groupId!,isImage: true);
               },
               child: Padding(
                 padding: const EdgeInsets.all(2.0),
@@ -391,7 +388,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         if (xfilePick != null) {
           galleryFile = File(pickedFile!.path);
           if (galleryFile != null) {
-            // groupChatController.sendTextMSg(widget.receiver.id,widget.sender,widget.receiver,isVideo: true,videoPath:galleryFile!.path);
+            groupChatController.sendMessageApi(widget.groupId!,isVideo: true,videoPath: galleryFile!.path);
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(// is this context <<<

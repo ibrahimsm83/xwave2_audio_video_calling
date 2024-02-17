@@ -67,8 +67,6 @@ class GroupChatRepository {
     print(usersList);
     print(imagePath);
     print("-----uploadFiles-------------");
-    // String header = await getToken_praf();
-    // print(header);
     var headers = {
       'Authorization': 'Bearer $token',
       //'Authorization': 'Bearer $header',

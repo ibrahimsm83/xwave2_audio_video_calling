@@ -105,13 +105,15 @@ class Media {
 class Sender {
   String? sId;
   String? phoneNumber;
+  String? avatar;
   String? username;
 
-  Sender({this.sId, this.phoneNumber, this.username});
+  Sender({this.sId, this.phoneNumber,this.avatar, this.username});
 
   Sender.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     phoneNumber = json['phoneNumber'];
+    avatar = json['avatar'];
     username = json['username'];
   }
 
@@ -119,6 +121,7 @@ class Sender {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['_id'] = this.sId;
     data['phoneNumber'] = this.phoneNumber;
+    data['avatar'] = this.avatar;
     data['username'] = this.username;
     return data;
   }
