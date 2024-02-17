@@ -34,4 +34,8 @@ mixin SocketMessageHandler{
     print("socket event triggered: ${name} with ${data}");
   }
 
+  void onEvent1(String name,data){
+    print("socket event triggered 11: ${name} with ${data}");
+  }
+
 }

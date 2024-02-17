@@ -6,9 +6,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/group_messages_model.dart';
+import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:chat_app_with_myysql/view/group_chat_screen/chat_components.dart';
 import 'package:chat_app_with_myysql/view/group_chat_screen/components.dart';
 import 'package:chat_app_with_myysql/view/group_chat_screen/controller.dart';
@@ -19,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../service/socket.dart';
 
 class GroupChatScreen extends StatefulWidget {
   String? groupImage;
@@ -34,9 +38,9 @@ class GroupChatScreen extends StatefulWidget {
   State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _GroupChatScreenState extends State<GroupChatScreen> {
+class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHandler {
   ApiService apiService = ApiService();
-  GroupMessageController groupChatController =
+ late GroupMessageController groupChatController =
       Get.put(GroupMessageController());
   final DashboardController dashboardController =
       Get.find<DashboardController>();
@@ -53,20 +57,31 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   String? _voicePat;
   bool _isPlaying = false;
-
+  // final SocketService socket_service =
+  // SocketService('https://xwavetechnologies.com');
+ // final SocketService socketService=SocketService(AppConfig.SERVER);
   @override
   void initState() {
     super.initState();
+    groupChatController =
+        Get.put(GroupMessageController());
     // valuesPrint();
-    registerEvent('groupMessages', groupChatController.msgListner);
+    // registerEvent('newGroupMessage', groupChatController.msgListner);
     //registerEvent('new-message',groupChatController.msgListner);
+
+    dashboardController.socketService.emitData("joinRoom",widget.groupId!);
+    print("connectSocket connect successfully---");
+    // socketService.connect(this, events:["newGroupMessage"]);
+    dashboardController.socketService.addEvent("newGroupMessage");
     _init();
+
     groupChatController.fetchChat(widget.groupId!);
   }
 
+
   @override
   void dispose() {
-    unregisterEvent('groupMessages');
+    //unregisterEvent('newGroupMessage');
     //unregisterEvent('new-group-chat');
     // audioPlayer.dispose();
     super.dispose();

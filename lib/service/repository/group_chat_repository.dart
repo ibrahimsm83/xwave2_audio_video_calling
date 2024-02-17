@@ -31,37 +31,6 @@ class GroupChatRepository {
     return groupsList ??[];
   }
 
-
-  ///Create Group Api
-  // Future<PageModel<User_model>?> crateGroupApi(
-  //     String token,
-  //     List<Map<String, String>> contacts,
-  //     ) async {
-  //   PageModel<User_model>? users;
-  //   const String url = AppConfig.DIRECTORY + "user/groupchat";
-  //   print("getApiContacts url: $url");
-  //   final String body = jsonEncode({"name": contacts,
-  //
-  //   });
-  //   await Network().post(url,body, headers: {
-  //     "Authorization": "Bearer ${token}",
-  //     'Content-type': 'application/json'
-  //   }, onSuccess: (val) {
-  //     print("getApiContacts response: ${val}");
-  //     var map = jsonDecode(val);
-  //     if (map["status"] == Network.STATUS_SUCCESS) {
-  //       var data = map["data"];
-  //       List list = data["registeredUsers"];
-  //       users = PageModel(
-  //         data: list.map<User_model>((cat) {
-  //           return User_model.fromJson(cat);
-  //         }).toList(),
-  //       );
-  //     }
-  //   });
-  //   return users;
-  // }
-
   Future<dynamic> createGroupApi(String groupName, List<String> usersList,String? imagePath, String token) async {
     print(groupName);
     print(usersList);

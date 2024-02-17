@@ -90,4 +90,9 @@ class SocketEvent {
       CALL_REJECTED="call_rejected",CALL_ENDED="call_ended";
   static const CHAT_LIST_UPDATE="chatListUpdate";
 
+  ///GroupChat
+  //Listner for room join is
+  static const GROUP_CHAT_ROOM_JOIN="joinRoom";
+  static const NEW_GROUP_MESSAGE="newGroupMessage";
+
 }

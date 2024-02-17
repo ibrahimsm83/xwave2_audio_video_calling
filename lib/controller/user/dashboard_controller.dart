@@ -2,17 +2,20 @@
 import 'package:chat_app_with_myysql/controller/auth_controller.dart';
 import 'package:chat_app_with_myysql/controller/user/call_controller.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
+import 'package:chat_app_with_myysql/model/group_messages_model.dart';
 import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/service/socket.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
+import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/view/auth/Login.dart';
 import 'package:get/get.dart';
 
 import '../../service/network/ApiService.dart';
+import '../../view/group_chat_screen/controller.dart';
 
 class DashboardController extends GetxController with SocketMessageHandler{
   User_model? user_model;
@@ -22,6 +25,7 @@ class DashboardController extends GetxController with SocketMessageHandler{
   final SocketService socketService=SocketService(AppConfig.SERVER);
 
   late CallController callController;
+   GroupMessageController groupController=Get.put(GroupMessageController());
 
   @override
   void onInit() {
@@ -34,6 +38,8 @@ class DashboardController extends GetxController with SocketMessageHandler{
   @override
   void onReady() {
     callController=Get.find<CallController>();
+    // groupController=Get.find<GroupMessageController>();
+
     super.onReady();
   }
 
@@ -54,6 +60,8 @@ class DashboardController extends GetxController with SocketMessageHandler{
   @override
   void onEvent(String name, data) {
     super.onEvent(name, data);
+    print("-----------$name");
+    print("-----------$data");
     if(name==SocketEvent.AUDIO_CALL || name==SocketEvent.VIDEO_CALL){
       VoiceCall call=VoiceCall.fromMap(data,side: VoiceCall.SIDE_RECEIVER,
           dialer: User_model.fromCallJson(data["from"]),receiver: user_model,
@@ -75,6 +83,12 @@ class DashboardController extends GetxController with SocketMessageHandler{
         status: data["action"],
         category: VoiceCall.CATEGORY_SINGLE,);
       callController.handleIncomingCall(call);
+    }else if(name==SocketEvent.NEW_GROUP_MESSAGE){
+      groupController.groupChatList.add(GroupMessages.fromJson(data['message']));
+      scrolList(groupController.scrollController);
+      print("----------------------3--33------------");
+      print(  groupController.groupChatList);
+
     }
 
   }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/group_messages_model.dart';
+import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/service/network.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
@@ -17,7 +18,7 @@ import 'package:http/http.dart' as http;
 
 import '../../util/config.dart';
 
-class GroupMessageController extends GetxController {
+class GroupMessageController extends GetxController with SocketMessageHandler {
   RxBool isLoading = false.obs;
   RxBool isMessageLoading = false.obs;
   RxBool isMicTapped = false.obs;
@@ -115,7 +116,7 @@ class GroupMessageController extends GetxController {
       print("getApiGroupUsers response--1: ${val}");
       var map = jsonDecode(val);
       print("getApiGroupUsers response--2: ${val}");
-      groupChatList.add(GroupMessages.fromJson(map['message']));
+      //groupChatList.add(GroupMessages.fromJson(map['message']));
     },
         onError: (e){
           print('Failed to load data: ${e}');
@@ -127,64 +128,76 @@ class GroupMessageController extends GetxController {
   }
 
 
+  // @override
+  // void onEvent(String name, data) {
+  //   super.onEvent(name, data);
+  //    print("---data------${data}");
+  //  print("-----name----${name}");
+  //   // print("-----3333---------");
+  //   print(data['message']);
+  //   groupChatList.add(GroupMessages.fromJson(data['message']));
+  //   scrolList(scrollController);
+  //
+  // }
 
-  ///Socket Listner...
-  msgListner(dynamic newMessage) async {
-    print("========myGroupChatListner---------");
-    print('msg - ' + newMessage.toString());
-
-    String contant = '';
-    String mediaType = '';
-    String url = '';
-    String lati = '',
-        longi = '';
-    String time = '';
-    String senderId = '';
-    String receiverId = '';
-
-    time = newMessage['createdAt'];
-
-    if (newMessage['receiver'] != null) {
-      receiverId = newMessage['receiver'];
-    }
-    if (newMessage['sender'] != null) {
-      senderId = newMessage['sender'];
-    }
-
-    if (newMessage['location'] != null) {
-      if (newMessage['location']['latitude'] != null) {
-        lati = newMessage['location']['latitude'].toString();
-        longi = newMessage['location']['longitude'].toString();
-      }
-    }
-
-    if (newMessage['content'] != null) {
-      contant = newMessage['content'];
-    }
-    mediaType = newMessage['media']['type'];
-    if (newMessage['media']['url'] != null) {
-      url = newMessage['media']['url'];
-    }
-    print("listener is running -----");
-    // chatList.add(ChatModel(content: contant, mediaType: mediaType, url: url, lati: lati, longi: longi, time: time, sender:senderUser , receiver: receiverUser));
-    // chatList.add(ChatModel(
-    //     content: contant,
-    //     mediaType: mediaType,
-    //     url: url,
-    //     lati: lati,
-    //     longi: longi,
-    //     time: time,
-    //     sender:
-    //     User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
-    //     receiver: User_model(
-    //         id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
-
-    print("lisntneeeeeeee");
-    // print(senderUser.id);
-    // print(receiverUser.id);
-
-    scrolList(scrollController);
-  }
+  // ///Socket Listner...
+  // msgListner(dynamic newMessage) async {
+  //   print("========myGroupChatListner---------");
+  //   print('msg - ' + newMessage.toString());
+  //
+  //   // String contant = '';
+  //   // String mediaType = '';
+  //   // String url = '';
+  //   // String lati = '',
+  //   //     longi = '';
+  //   // String time = '';
+  //   // String senderId = '';
+  //   // String receiverId = '';
+  //   //
+  //   // time = newMessage['createdAt'];
+  //   //
+  //   // if (newMessage['receiver'] != null) {
+  //   //   receiverId = newMessage['receiver'];
+  //   // }
+  //   // if (newMessage['sender'] != null) {
+  //   //   senderId = newMessage['sender'];
+  //   // }
+  //   //
+  //   // if (newMessage['location'] != null) {
+  //   //   if (newMessage['location']['latitude'] != null) {
+  //   //     lati = newMessage['location']['latitude'].toString();
+  //   //     longi = newMessage['location']['longitude'].toString();
+  //   //   }
+  //   // }
+  //   //
+  //   // if (newMessage['content'] != null) {
+  //   //   contant = newMessage['content'];
+  //   // }
+  //   // mediaType = newMessage['media']['type'];
+  //   // if (newMessage['media']['url'] != null) {
+  //   //   url = newMessage['media']['url'];
+  //   // }
+  //   print("listener is running -----");
+  //   // groupChatList.add(GroupMessages.fromJson(map['message']));
+  //   // chatList.add(ChatModel(content: contant, mediaType: mediaType, url: url, lati: lati, longi: longi, time: time, sender:senderUser , receiver: receiverUser));
+  //   // chatList.add(ChatModel(
+  //   //     content: contant,
+  //   //     mediaType: mediaType,
+  //   //     url: url,
+  //   //     lati: lati,
+  //   //     longi: longi,
+  //   //     time: time,
+  //   //     sender:
+  //   //     User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
+  //   //     receiver: User_model(
+  //   //         id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
+  //
+  //   print("lisntneeeeeeee");
+  //   // print(senderUser.id);
+  //   // print(receiverUser.id);
+  //
+  //   scrolList(scrollController);
+  // }
 
   ///Upload Files
   Future<dynamic> uploadFiles(String filePath, String? recid,String mediaType,String Url) async {
@@ -216,10 +229,10 @@ class GroupMessageController extends GetxController {
       // String responseBody = await utf8.decode(response.bodyBytes);
       print("---------my chat response------2-----");
       print(data['message']);
-      groupChatList.add(GroupMessages.fromJson(data['message']));
+     // groupChatList.add(GroupMessages.fromJson(data['message']));
       print("---------my chat response------3-----");
       print(data['message']);
-      scrolList(scrollController);
+      //scrolList(scrollController);
     }
     else {
       print(response.reasonPhrase);

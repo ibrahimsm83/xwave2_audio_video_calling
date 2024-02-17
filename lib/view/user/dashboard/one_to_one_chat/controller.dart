@@ -48,13 +48,10 @@ class ChatController extends GetxController {
   fetchChat(String receiverId) async {
     print('-----set users----');
     chatList.value = [];
-    //isLoading.value = true;
     EasyLoading.show();
     var response = await apiService.getApiWithToken(fetch1To1chat + receiverId);
     print(response.body);
     EasyLoading.dismiss();
-    //isLoading.value = false;
-
     if (response.statusCode == 200) {
       var map=jsonDecode(response.body);
       List<dynamic> list = map;
