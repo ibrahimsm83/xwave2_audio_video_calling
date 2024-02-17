@@ -1,3 +1,4 @@
+import 'package:chat_app_with_myysql/resources/asset_path.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,4 +25,9 @@ class CustomMonoIcon extends StatelessWidget implements ResizableIcon{
 
   @override
   double get getIconSize => size!;
+}
+
+class IconMoreVert extends CustomMonoIcon{
+  const IconMoreVert({Key? key,double? size,Color? color,}):super(key: key,
+      icon: AssetPath.ICON_MORE_VERT,size: size,color: color,isSvg: true);
 }

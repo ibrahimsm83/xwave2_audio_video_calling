@@ -19,6 +19,8 @@ class AssetPath {
   static const ICON_CALL="${baseImagePath}ic_call.svg";
   static const ICON_CUT_CALL="${baseImagePath}ic_cut_call.svg";
 
+  static const ICON_MORE_VERT="${baseImagePath}ic_more_vert.svg";
+
   static const AUDIO_DIALING1="${baseAudioPath}dialing1.mp3";
   static const AUDIO_DIALING11="audios/dialing1.mp3";
 

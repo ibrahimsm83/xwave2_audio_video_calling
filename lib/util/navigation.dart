@@ -1,10 +1,8 @@
 import 'package:chat_app_with_myysql/resources/integer.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
+import 'package:chat_app_with_myysql/widget/popup_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
-
-import 'constants.dart';
 
 class AppNavigator{
 
@@ -106,12 +104,104 @@ class AppDialog {
     // Get.dialog(widget)
   }
 
-  static Future<T?> showBottomPanel<T>(BuildContext context,Widget widget,){
-    return showModalBottomSheet<T>(context: context, backgroundColor: AppColor.colorTransparent,
+  static Future<T?> showBottomPanel<T>(
+      BuildContext context,
+      Widget widget,
+      ) {
+    var media = MediaQuery.of(Get.context!);
+    return showModalBottomSheet<T>(
+        context: context,
+        backgroundColor: AppColor.colorTransparent,
         enableDrag: false,
-        builder: (con){
-          return widget;
+        isScrollControlled: true,
+        useSafeArea: false,
+        //constraints: BoxConstraints.tight(Size.fromHeight(AppSizer.getPerHeight(1))),
+        builder: (con) {
+          return Padding(
+            padding: EdgeInsets.only(top: media.viewPadding.top),
+            child: Container(child: widget),
+          );
         });
   }
 
+}
+
+class AppOverlay{
+
+
+  static OverlayEntry? _entry;
+
+  static void showPopupMenu(BuildContext context,
+      {required List<PopupNavigationItem> items,
+        required void Function(PopupNavigationItem item) onSelect,
+        Color bgColor=AppColor.colorBlack}){
+    var offset=Offset.zero;
+    final RenderBox button = context.findRenderObject()! as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
+
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(offset, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero) + offset, ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    showMenu<PopupNavigationItem>(context: context, position: position,
+      color: bgColor,
+      items: items.map((widget) {
+        return PopupMenuItem<PopupNavigationItem>(
+            height: 0,value: widget,
+            padding: EdgeInsets.zero,
+            child: widget);
+      }).toList(),).then((value) {
+      print("value is: $value");
+      if(value!=null){
+        onSelect.call(value);
+      }
+
+    });
+  }
+
+  static Offset getGlobalTapPosition(BuildContext context){
+    var offset=Offset.zero;
+    var renderBox = context.findRenderObject();
+    if(renderBox is RenderBox) {
+      var size = renderBox.size;
+      offset = renderBox.localToGlobal(Offset.zero);
+    }
+    return offset;
+  }
+
+  static OverlayEntry? showOverlay(BuildContext context,Widget widget,{Offset? position}){
+    if(_entry==null) {
+      var entry = OverlayEntry(builder: (con) {
+        return GestureDetector(
+          onTap: (){
+            dissmissOverlay();
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: Stack(children: [
+              position != null ? Positioned(
+                  top: position.dy, left: position.dx,
+                  child: widget) : Center(child: widget,)
+            ],),
+          ),
+        );
+
+
+      });
+      var overlay = Overlay.of(context);
+      overlay.insert(entry);
+      _entry = entry;
+      return _entry;
+    }
+  }
+
+  static void dissmissOverlay(){
+    if(_entry!=null) {
+      _entry!.remove();
+      _entry=null;
+    }
+  }
 }
