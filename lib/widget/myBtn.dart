@@ -1,5 +1,6 @@
-
+import 'package:chat_app_with_myysql/resources/dimen.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
+import 'package:chat_app_with_myysql/util/sizer.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
 import 'package:chat_app_with_myysql/widget/icons.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
@@ -10,20 +11,27 @@ import 'package:get/get.dart';
 class myBtn extends StatelessWidget {
   GestureDetector gestureDetector;
   String text;
-  double width,height;
+  double width, height;
   Color color;
-  
 
-   myBtn({super.key,required this.text,this.width=200,this.height=40,required this.color,required this.gestureDetector});
+  myBtn(
+      {super.key,
+      required this.text,
+      this.width = 200,
+      this.height = 40,
+      required this.color,
+      required this.gestureDetector});
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(onPressed: gestureDetector.onTap, child: myText(text: text,fontWeight: FontWeight.bold,size: 15),style: ElevatedButton.styleFrom(
-      backgroundColor: color,fixedSize: Size(width, height)
-    ),);
+    return ElevatedButton(
+      onPressed: gestureDetector.onTap,
+      child: myText(text: text, fontWeight: FontWeight.bold, size: 15),
+      style: ElevatedButton.styleFrom(
+          backgroundColor: color, fixedSize: Size(width, height)),
+    );
   }
 }
-
 
 class CircularButton extends StatelessWidget {
   final double diameter;
@@ -37,7 +45,8 @@ class CircularButton extends StatelessWidget {
   const CircularButton({
     Key? key,
     required this.diameter,
-    required this.icon,this.isSvg=true,
+    required this.icon,
+    this.isSvg = true,
     this.bgColor = AppColor.colorWhite,
     this.elevation = 0,
     this.ratio = 0.4,
@@ -66,11 +75,54 @@ class CircularButton extends StatelessWidget {
   }
 
   Widget buildChild() {
-    return icon!=null?CustomMonoIcon(
-      size: diameter * ratio,
-      icon: icon!,
-      color: color,
-      isSvg: isSvg,
-    ):Container();
+    return icon != null
+        ? CustomMonoIcon(
+            size: diameter * ratio,
+            icon: icon!,
+            color: color,
+            isSvg: isSvg,
+          )
+        : Container();
   }
+}
+
+class CustomIconButton extends StatelessWidget {
+  final ResizableIcon icon;
+  final void Function()? onTap;
+  const CustomIconButton({
+    Key? key,
+    required this.icon,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+            color: AppColor.colorTransparent,
+            child: IconButton(
+              icon: Container(
+                  //   color: AppColor.COLOR_RED1,
+                  child: buildIcon()),
+              onPressed: onTap,
+              iconSize: icon.getIconSize,
+              constraints: const BoxConstraints(),
+            )));
+  }
+
+  Widget buildIcon() {
+    return icon;
+  }
+}
+
+class PopupMenuButton extends CustomIconButton {
+  PopupMenuButton({
+    Key? key,
+  }) : super(
+          key: key,
+          icon: IconMoreVert(
+            size: AppSizer.getHeight(AppDimen.ICON_MENU_SIZE),
+          ),
+        );
+
 }

@@ -43,7 +43,7 @@ class AudioCallLayoutState extends State<AudioCallLayout> {
       child: Stack(
         children: [
           Align(
-            alignment: const FractionalOffset(0.5,0.1),
+            alignment: const FractionalOffset(0.5,0.0),
             child: buildInfo(currentCall),
           ),
           Positioned(

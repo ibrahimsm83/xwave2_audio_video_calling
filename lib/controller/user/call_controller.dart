@@ -10,7 +10,7 @@ import 'package:chat_app_with_myysql/service/call_service.dart';
 import 'package:chat_app_with_myysql/service/repository/call_repository.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
-import 'package:chat_app_with_myysql/view/user/dashboard/call/call_screen.dart';
+import 'package:chat_app_with_myysql/view/user/dashboard/call/calling/call_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';

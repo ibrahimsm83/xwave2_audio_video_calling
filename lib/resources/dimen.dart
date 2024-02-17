@@ -9,8 +9,10 @@ class AppDimen{
 
   static const double APPBAR_ICON_SIZE = 20;
   static const double APPBAR_ICON_BUTTON_SIZE=36;
+  static const double ICON_MENU_SIZE=18;
 
   static const double CON_RADIUS=20;
+  static const double BOTTOM_SHEET_RADIUS=0;
 
   static const double CONTROLS_BOTTOM=20;
 

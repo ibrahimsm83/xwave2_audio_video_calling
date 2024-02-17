@@ -47,11 +47,9 @@ class CallService extends GetxService{
     await _engine.startPreview();
     //await _engine.enableLocalVideo(true);
     print("preview started");
-
     await _joinChannel();
-
     await _engine.setEnableSpeakerphone(_loudSpeaker);
-    print("loudspeaker: ${await _engine.isSpeakerphoneEnabled()}");
+
 
   }
 
@@ -68,7 +66,6 @@ class CallService extends GetxService{
     call.guest.num_id=0;
     await _engine.leaveChannel();
     await _engine.release();
-
    // _engine.unregisterEventHandler(eventHandler);
     print("agora engine destroyed");
   }
