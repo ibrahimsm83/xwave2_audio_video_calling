@@ -69,10 +69,9 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
     // registerEvent('newGroupMessage', groupChatController.msgListner);
     //registerEvent('new-message',groupChatController.msgListner);
 
-    dashboardController.socketService.emitData("joinRoom",widget.groupId!);
+    dashboardController.socketService.emitData(SocketEvent.GROUP_CHAT_ROOM_JOIN,widget.groupId!);
     print("connectSocket connect successfully---");
-    // socketService.connect(this, events:["newGroupMessage"]);
-    dashboardController.socketService.addEvent("newGroupMessage");
+    dashboardController.socketService.addEvent(SocketEvent.NEW_GROUP_MESSAGE);
     _init();
 
     groupChatController.fetchChat(widget.groupId!);
@@ -81,7 +80,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
 
   @override
   void dispose() {
-    //unregisterEvent('newGroupMessage');
+   dashboardController.socketService.removeEvent(SocketEvent.NEW_GROUP_MESSAGE);
+   //unregisterEvent('newGroupMessage');
     //unregisterEvent('new-group-chat');
     // audioPlayer.dispose();
     super.dispose();

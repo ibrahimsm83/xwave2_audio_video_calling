@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/model/OnetoOneChatRoomModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
+import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/util/helper_functions.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
@@ -36,9 +38,7 @@ class Messages extends StatefulWidget {
 class _MessagesState extends State<Messages> {
   final DashboardController dashboardController =
       Get.find<DashboardController>();
-
   ApiService apiService = ApiService();
-
   bool isLoading = false;
   String message = "hello";
 
@@ -119,7 +119,7 @@ class _MessagesState extends State<Messages> {
           itemBuilder: (context, index) {
             return isLoading
                 ? buildUserShimmer()
-               :Padding(
+                : Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: InkWell(
                       onTap: () {
@@ -137,30 +137,89 @@ class _MessagesState extends State<Messages> {
                             receiver: chatRoomsModels[index].user_model));
                       },
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          my_profile_container(
-                              img: chatRoomsModels[index].user_model.avatar),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              myText(
-                                text:
-                                    chatRoomsModels[index].user_model.username,
-                                color: Colors.black,
-                                size: 16,
-                                fontWeight: FontWeight.w500,
+                              CircleAvatar(
+                                radius: 28.0,
+                                backgroundColor: AppColor.appYellow,
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.contain,
+                                  imageUrl:
+                                      chatRoomsModels[index].user_model.avatar,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          CircularProgressIndicator(
+                                              value: downloadProgress.progress),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
                               ),
-                              myText(
-                                text: chatRoomsModels[index].msg,
-                                color: appSilver,
-                                size: 10,
+                              const SizedBox(width: 10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    chatRoomsModels[index].user_model.username,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                      fontFamily: "Roboto",
+                                    ),
+                                  ),
+                                  Text(
+                                    chatRoomsModels[index].msg,
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             ],
-                          )
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                    DateTimeManager
+                                        .getFormattedDateTimeFromDateTime(
+                                      DateTime.parse(
+                                          chatRoomsModels[index].time),
+                                      isutc: true,
+                                      format: DateTimeManager.timeFormat3,
+                                    ),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontFamily: "Roboto",
+                                        fontSize: 12
+                                    )),
+                                Container(
+                                    decoration: const BoxDecoration(
+                                      color: AppColor.appYellow,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text("1",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Roboto",
+                                          )),
+                                    ))
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -188,24 +247,16 @@ class _MessagesState extends State<Messages> {
   }
 
   List<OnetoOneChatRoomModel> chatRoomsModels = [];
-
   fetchRooms() async {
     setState(() {
       isLoading = true;
     });
-
     var response = await apiService.getApiWithToken(fetch1To1chatRooms);
-    print("Fetch Room response----------");
-    print(response.body.toString());
-
     if (response.statusCode == 200) {
-      print("Fetch Room response-success---------");
-      print("------response--Messagess---$response");
       var data = jsonDecode(response.body);
-      if(data.isEmpty){
+      if (data.isEmpty) {
         AppMessage.showMessage("Please add Users in Your device contact");
       }
-
     }
     setState(() {
       isLoading = false;

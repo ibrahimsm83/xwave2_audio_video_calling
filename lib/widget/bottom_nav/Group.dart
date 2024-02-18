@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_with_myysql/controller/user/group_chat_controller.dart';
 import 'package:chat_app_with_myysql/model/group_chat_users_model.dart';
+import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/view/create_group/create_group_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -114,10 +115,10 @@ class _GroupState extends State<Group> {
                                   title: apiController
                                       .groupsChatList[index].chatName,
                                   userCount: apiController
-                                      .groupsChatList[index].userCount.toString(),
-                                  groupId: apiController
-                                      .groupsChatList[index].id,
-
+                                      .groupsChatList[index].userCount
+                                      .toString(),
+                                  groupId:
+                                      apiController.groupsChatList[index].id,
                                 ),
                               );
                             },
@@ -220,7 +221,6 @@ class _GroupState extends State<Group> {
   }
 
   Widget chatUser(GroupChatUsersModel groupModel) {
-    DateTime dateTime = DateTime.parse(groupModel.createdAt);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Container(
@@ -276,10 +276,17 @@ class _GroupState extends State<Group> {
                 padding: const EdgeInsets.only(right: 10.0),
                 child: Column(
                   children: [
-                    Text(DateFormat('HH:mm').format(dateTime),
+                    Text(
+                        DateTimeManager.getFormattedDateTimeFromDateTime(
+                          DateTime.parse(groupModel.createdAt),
+                          isutc: true,
+                          format: DateTimeManager.timeFormat3,
+                        ),
+                        //DateFormat('HH:mm').format(dateTime),
                         style: const TextStyle(
                           color: Colors.grey,
                           fontFamily: "Roboto",
+                          fontSize: 12
                         )),
                     Container(
                         decoration: const BoxDecoration(

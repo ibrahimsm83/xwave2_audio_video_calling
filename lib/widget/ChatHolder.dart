@@ -25,19 +25,14 @@ class chatHolder extends StatefulWidget {
 
 class _chatHolderState extends State<chatHolder> {
   AudioPlayer audioPlayer = AudioPlayer();
-  //late VideoPlayerController _controller;
   VideoPlayerController? _controller;
   bool isPlaying=false;
   Duration duration=Duration.zero;
   Duration position=Duration.zero;
-  //late Chewie _chewie;
-  //late ChewieController _chewieController;
   ChewieController? _chewieController;
 
   @override
   void initState() {
-
-
      /// Set up listeners for player state changes
     audioPlayer.onPlayerStateChanged.listen((state) {
       setState(() {
@@ -45,14 +40,12 @@ class _chatHolderState extends State<chatHolder> {
         isPlaying = state == PlayerState.playing;
       });
     });
-
     /// Listen to Audio Duration
     audioPlayer.onDurationChanged.listen((Duration newDuration) {
       setState(() {
         duration = newDuration;
       });
     });
-
     /// Listen to Audio position
     audioPlayer.onPositionChanged.listen((Duration newPosition) {
       setState(() {
@@ -60,7 +53,6 @@ class _chatHolderState extends State<chatHolder> {
       });
     });
     ///Video player controller initalize
-    /////'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'
     if(widget.model.mediaType=="video") {
       _controller = VideoPlayerController.networkUrl(Uri.parse(
           widget.model.url))
@@ -82,7 +74,6 @@ class _chatHolderState extends State<chatHolder> {
         }
       });
     }else{
-
     }
 
     super.initState();

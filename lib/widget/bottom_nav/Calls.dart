@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+
+import 'package:flutter/material.dart';
 
 class Calls extends StatefulWidget {
   const Calls({super.key});
@@ -10,6 +11,8 @@ class Calls extends StatefulWidget {
 class _CallsState extends State<Calls> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const  Scaffold(
+      body: Center(child: Text("Call History"),),
+    );
   }
 }

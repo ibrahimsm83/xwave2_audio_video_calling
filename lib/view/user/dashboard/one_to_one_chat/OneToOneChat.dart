@@ -62,7 +62,12 @@ class _OneToOneChatState extends State<OneToOneChat> {
      //fetchChat();
    }
 
-
+   @override
+   void dispose() {
+     unregisterEvent('new-message');
+     // audioPlayer.dispose();
+     super.dispose();
+   }
 
 
    _init() async {
@@ -487,12 +492,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
        },
      );
    }
-   @override
-  void dispose() {
-    unregisterEvent('new-message');
-    // audioPlayer.dispose();
-    super.dispose();
-  }
+
 }
 
 
