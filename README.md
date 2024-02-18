@@ -1,16 +1,12 @@
 # chat_app_with_myysql
 
 A new Flutter project.
+Fluter SDK 3.16.5
 
-## Getting Started
+Core Features Audio Video calling ,chat Integration.
 
-This project is a starting point for a Flutter application.
+Figma Link:
+https://www.figma.com/file/XXQdHu9WtZrJr2jTBLahsH/X-WAVE?type=design&node-id=0-1&mode=design&t=xiCwrYXQpqZvh0Jm-0
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Figma Design:
+![Screenshot 2024-02-18 at 10 30 45 AM](https://github.com/ibrahimsm83/xwave2_audio_video_calling/assets/60535727/f519ab18-e679-45e5-a05d-a8d852f8c683)
