@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/service/network.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
+import 'package:chat_app_with_myysql/util/helper_functions.dart';
 
 class CallRepository {
 
@@ -49,4 +50,25 @@ class CallRepository {
     );
     return user;
   }
+
+  Future<bool> inviteCallParticipants(String token, String call_id,List<String> ids,) async {
+    bool user=false;
+    const String url = AppConfig.DIRECTORY + "user/addParticipantToCall";
+    print("inviteCallParticipants url: $url");
+    final map = jsonEncode({"callId": call_id,"participantsToAdd":ids,});
+    print("inviteCallParticipants map: $map");
+    await Network().post(
+      url,
+      map,
+      headers: {"Authorization":"Bearer $token",'Content-type': 'application/json'},
+      onSuccess: (val) {
+        print("inviteCallParticipants response: $val");
+        var map = jsonDecode(val);
+        user = map["status"] == Network.STATUS_SUCCESS;
+        AppMessage.showMessage(map["message"].toString());
+      },
+    );
+    return user;
+  }
+
 }

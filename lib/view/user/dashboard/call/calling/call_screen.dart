@@ -8,6 +8,7 @@ import 'package:chat_app_with_myysql/service/socket.dart';
 import 'package:chat_app_with_myysql/util/common_methods.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
+import 'package:chat_app_with_myysql/view/user/dashboard/call/add_participants.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/call/calling/audio.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/call/calling/video.dart';
 import 'package:chat_app_with_myysql/widget/app_bar.dart';
@@ -61,29 +62,34 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         canPop: false,
         child: CustomBackground(
             bgColor: AppColor.appBlack,
-            child: Scaffold(
-                backgroundColor: AppColor.colorTransparent,
-                appBar: DashboardAppbar(
-                  action: Builder(
-                    builder: (context) {
+            child: GetBuilder<CallController>(builder: (cont) {
+              final VoiceCall currentCall = cont.currentCall!;
+              return Scaffold(
+                  backgroundColor: AppColor.colorTransparent,
+                  appBar: !currentCall.isVideo?DashboardAppbar(
+                    action: (currentCall.isConnecting || currentCall.isConnected)?Builder(builder: (con) {
                       return CustomIconButton(
-                        onTap: (){
-                          CommonMethods.showBottomOptions(context, title: "", options: [
-                            PopupNavigationItem(title:"Add to Call",onTap: (){
-
-                            },)
-                          ]);
+                        onTap: () {
+                          CommonMethods.showBottomOptions(con,
+                              title: "",
+                              options: [
+                                PopupNavigationItem(
+                                  title: "Add to Call",
+                                  onTap: () {
+                                    AppDialog.showBottomPanel(
+                                        context, AddParticipantsSheet(),
+                                        isDismissible: false);
+                                  },
+                                )
+                              ]);
                         },
                         icon: IconMoreVert(
                           size: AppSizer.getHeight(AppDimen.APPBAR_ICON_SIZE),
                         ),
                       );
-                    }
-                  ),
-                ),
-                body: GetBuilder<CallController>(builder: (cont) {
-                  final VoiceCall? currentCall = cont.currentCall;
-                  return currentCall != null
+                    }):null,
+                  ):null,
+                  body: currentCall != null
                       ? AnimatedBuilder(
                           animation: animationController,
 
@@ -121,11 +127,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                             );
                           }, //child: buildLayout(cont,currentCall),
                           /*  child: (currentCall.type==VoiceCall.TYPE_AUDIO?
-        AudioCallLayout(cont:cont,controller: animationController,): VideoCallLayout(cont: cont,
-          controller: animationController,)),*/
+                        AudioCallLayout(cont:cont,controller: animationController,): VideoCallLayout(cont: cont,
+                          controller: animationController,)),*/
                         )
-                      : Container();
-                }))));
+                      : Container());
+            })));
   }
 
   Widget buildLayout(CallController cont, VoiceCall currentCall) {

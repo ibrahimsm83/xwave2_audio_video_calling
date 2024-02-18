@@ -64,7 +64,7 @@ appBarForChatScreen(BuildContext context, {String? image, String? title,String? 
                   ),
                 ),
                 Spacer(),
-                IconButton(onPressed: () {
+     /*           IconButton(onPressed: () {
                   //   callController.audioCall(widget.receiver);
                   //  next_page(MakingAudioCall(receiver: widget.receiver));
         
@@ -74,7 +74,7 @@ appBarForChatScreen(BuildContext context, {String? image, String? title,String? 
                 IconButton(onPressed: () {
                  // callController.videoCall(widget.receiver);
                   //next_page(VideoCallForCaller( user_model: widget.receiver, chanelName: '',));
-                }, icon: Icon(CupertinoIcons.video_camera,color: appYellow,)),
+                }, icon: Icon(CupertinoIcons.video_camera,color: appYellow,)),*/
         
               ],
             ),

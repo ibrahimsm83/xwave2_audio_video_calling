@@ -1,5 +1,6 @@
 
 import 'package:chat_app_with_myysql/model/User_model.dart';
+import 'package:chat_app_with_myysql/util/datetime.dart';
 
 class ChatModel{
   late String content,mediaType,url,lati,longi,time;
@@ -22,7 +23,10 @@ class ChatModel{
       url: json["url"]??'',
       lati: json["lati"]??'',
       longi: json["longi"]??'',
-      time: json["time"]??'',
+      //time: json["time"]??'',
+      time: DateTimeManager.getFormattedDateTime(json['time'],isutc: true,
+          format: DateTimeManager.dateTimeFormat,
+          format2: DateTimeManager.dateTimeFormat24_2),
       sender: User_model.fromJson(json["sender"]),
       receiver: json["receiver"],
     );

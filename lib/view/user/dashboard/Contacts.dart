@@ -11,6 +11,7 @@ import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/OneToOn
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
 import 'package:chat_app_with_myysql/widget/list_data/list_data.dart';
+import 'package:chat_app_with_myysql/widget/list_data/listview_data.dart';
 import 'package:chat_app_with_myysql/widget/loader.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/widget/my_profile_container.dart';
@@ -98,12 +99,12 @@ class _ContactsState extends State<Contacts> {
           Expanded(
             child: Obx(
               () {
-                List<User_model>? list=contactController.users.value.data;
+                final List<User_model>? list=contactController.users.value.data;
                 return RefreshIndicator(
                   onRefresh: () async{
                     contactController.refreshContacts();
                   },
-                  child: ListDataWidget(list:list,
+                  child: ListViewDataWidget(list:list,
                     padding: const EdgeInsets.all(10.0),
                     //shrinkWrap: true,physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (ind,model){

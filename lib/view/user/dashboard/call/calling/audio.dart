@@ -1,10 +1,13 @@
 import 'package:chat_app_with_myysql/controller/user/call_controller.dart';
+import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/resources/asset_path.dart';
 import 'package:chat_app_with_myysql/resources/dimen.dart';
 import 'package:chat_app_with_myysql/resources/lang/strings.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/datetime.dart';
+import 'package:chat_app_with_myysql/util/sizer.dart';
+import 'package:chat_app_with_myysql/widget/call_items.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
 import 'package:chat_app_with_myysql/widget/myBtn.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
@@ -39,23 +42,46 @@ class AudioCallLayoutState extends State<AudioCallLayout> {
     return Container(
       //width: 1.sw,height: 1.sh,
       width: Get.width, height: Get.height,
-     // color: AppColor.appBlack,
-      child: Stack(
+      // color: AppColor.appBlack,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: const FractionalOffset(0.5,0.0),
-            child: buildInfo(currentCall),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              buildInfo(currentCall),
+              const Spacer(),
+              Visibility(
+                visible: currentCall.isGroup,
+                child: buildCallParticipants(currentCall),
+              ),
+            ],
+          )),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: AppDimen.CONTROLS_BOTTOM),
+            child: buildControls(
+              currentCall,
+            ),
           ),
-          Positioned(
-              bottom: AppDimen.CONTROLS_BOTTOM,
-              left: 0,
-              right: 0,
-              child: buildControls(
-                currentCall,
-              )),
         ],
       ),
     );
+  }
+
+  Widget buildCallParticipants(VoiceCall voiceCall) {
+    final List<User_model> list = callController.getParticipantsUsers();
+    final double spacing = AppSizer.getHeight(10);
+    return Wrap(
+        spacing: spacing,
+        runSpacing: spacing,
+        children: list.map((e) {
+          var user = voiceCall.getParticipant(e.id) ?? e;
+          return UserVoiceContainer(
+            user: user,
+          );
+        }).toList());
   }
 
   Widget buildInfo(VoiceCall currentCall) {
@@ -63,20 +89,9 @@ class AudioCallLayoutState extends State<AudioCallLayout> {
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircularPic(
-          diameter: 126,
-          imageType: ImageType.TYPE_NETWORK,
-          image: callController.currentCall!.guest.avatar,
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        CustomText(
-          text: callController.currentCall!.guest.username,
-          fontcolor: AppColor.colorWhite,
-          fontsize: 26,
-          fontweight: FontWeight.bold,
-        ),
+        !currentCall.isGroup
+            ? buildGuest(currentCall.guest)
+            : buildMultiGuest(currentCall.getParticipants()),
         SizedBox(
           height: 10,
         ),
@@ -86,23 +101,60 @@ class AudioCallLayoutState extends State<AudioCallLayout> {
     ));
   }
 
+  Widget buildGuest(User_model user) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularPic(
+          diameter: 126,
+          imageType: ImageType.TYPE_NETWORK,
+          image: user.avatar,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CustomText(
+          text: user.username,
+          fontcolor: AppColor.colorWhite,
+          fontsize: 26,
+          fontweight: FontWeight.bold,
+        ),
+      ],
+    );
+  }
+
+  Widget buildMultiGuest(List<User_model> users) {
+    return CustomText(
+      text: users.map((e) => e.username).join(","),
+      fontcolor: AppColor.colorWhite,
+      fontsize: 26,
+      fontweight: FontWeight.bold,
+    );
+  }
+
   Widget buildStatus(VoiceCall currentCall) {
     return CustomText(
-      text: currentCall.isDialed
+      text: (currentCall.isDialed
           ? (currentCall.isIdle
               ? "${AppStrings.TEXT_DIALING}"
               : currentCall.isConnecting
                   ? "${AppStrings.TEXT_CONNECTING}..."
                   : currentCall.isConnected
                       ? "${AppStrings.TEXT_CONNECTED}"
-                      : "")
+                      : currentCall.isEnded
+                          ? "${AppStrings.TEXT_ENDED}"
+                          : "")
           : (currentCall.isIdle
-              ? "${AppStrings.TEXT_INCOMING_CALL}"
+              ? currentCall.isGroup
+                  ? "${AppStrings.TEXT_INCOMING_GROUP_CALL}"
+                  : "${AppStrings.TEXT_INCOMING_CALL}"
               : currentCall.isConnecting
                   ? "${AppStrings.TEXT_CONNECTING}..."
                   : currentCall.isConnected
                       ? "${AppStrings.TEXT_CONNECTED}"
-                      : ""),
+                      : currentCall.isEnded
+                          ? "${AppStrings.TEXT_ENDED}"
+                          : "")),
       fontweight: FontWeight.bold,
       fontcolor: AppColor.colorBlue,
     );
@@ -143,64 +195,65 @@ class AudioCallLayoutState extends State<AudioCallLayout> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Visibility(
-          visible: !currentCall.isIdle,
-          child: buildButton(
-              callController.isAudioMuted
-                  ? AssetPath.ICON_MIC_CROSS
-                  : AssetPath.ICON_MIC,
-              isSvg: false, onTap: () {
-            callController.muteAudio();
-          }),
-        ),
-        SizedBox(
-          width: spacing,
+            visible: currentCall.isConnecting || currentCall.isConnected,
+            child: Row(
+              children: [
+                buildButton(
+                    callController.isAudioMuted
+                        ? AssetPath.ICON_MIC_CROSS
+                        : AssetPath.ICON_MIC,
+                    isSvg: false, onTap: () {
+                  callController.muteAudio();
+                }),
+                SizedBox(
+                  width: spacing,
+                ),
+                buildButton(
+                  AssetPath.ICON_VIDEO,
+                  onTap: widget.onTypeChanged,
+                ),
+                SizedBox(
+                  width: spacing,
+                ),
+                buildButton(
+                    callController.isLoudSpeakerOn
+                        ? AssetPath.ICON_SPEAKER
+                        : AssetPath.ICON_SPEAKER_CROSS,
+                    isSvg: false, onTap: () {
+                  callController.toggleLoudSpeaker();
+                }),
+                SizedBox(
+                  width: spacing,
+                ),
+              ],
+            )),
+        buildActionButtons(currentCall),
+      ],
+    );
+  }
+
+  Widget buildActionButtons(VoiceCall currentCall){
+    return Row(
+      children: [
+        Visibility(
+          visible: (!currentCall.isDialed && currentCall.isIdle),
+          child: buildButton(AssetPath.ICON_CALL,
+              bgColor: AppColor.colorGreen1,
+              iconColor: AppColor.colorWhite, onTap: () {
+                callController.receiveCall();
+              }),
         ),
         Visibility(
-          visible: !currentCall.isIdle,
-          child: buildButton(
-            AssetPath.ICON_VIDEO,
-            onTap: widget.onTypeChanged,
-          ),
-        ),
-        SizedBox(
-          width: spacing,
-        ),
-        Visibility(
-          visible: !currentCall.isIdle,
-          child: buildButton(
-              callController.isLoudSpeakerOn
-                  ? AssetPath.ICON_SPEAKER
-                  : AssetPath.ICON_SPEAKER_CROSS,
-              isSvg: false, onTap: () {
-            callController.toggleLoudSpeaker();
-          }),
-        ),
-        SizedBox(
-          width: spacing,
-        ),
-        (!currentCall.isDialed && currentCall.isIdle)
-            ? Row(
-                children: [
-                  buildButton(AssetPath.ICON_CALL,
-                      bgColor: AppColor.colorGreen1,
-                      iconColor: AppColor.colorWhite, onTap: () {
-                    callController.receiveCall();
-                  }),
-                  SizedBox(
-                    width: spacing,
-                  ),
-                  buildButton(AssetPath.ICON_CUT_CALL,
-                      bgColor: AppColor.colorRed1,
-                      iconColor: AppColor.colorWhite, onTap: () {
-                    callController.endCall();
-                  }),
-                ],
-              )
-            : buildButton(AssetPath.ICON_CALL,
+          visible: !currentCall.isEnded,
+          child: Padding(
+            padding: EdgeInsets.only(left: spacing),
+            child: buildButton(AssetPath.ICON_CUT_CALL,
                 bgColor: AppColor.colorRed1,
                 iconColor: AppColor.colorWhite, onTap: () {
-                callController.endCall();
-              }),
+                  callController.endCall();
+                }),
+          ),
+        ),
       ],
     );
   }

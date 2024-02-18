@@ -5,7 +5,6 @@ class DateTimeManager {
   static const String dateTimeFormat24 = "yyyy-MM-dd HH:mm:ss";
   static const String dateTimeFormat24_2 = "yyyy-MM-ddTHH:mm:ssZ";
   static const String dateTimeFormat = "yyyy-MM-dd hh:mm aa"; // main keep format
-  static const String dateTimeFormat24_3 = "MM-dd-yyyy HH:mm:ss";
 
   // static const dateFormat="yyyy-MM-dd";
 
@@ -19,8 +18,7 @@ class DateTimeManager {
 
   static const timeFormat1 = "HH:mm:ss";
   static const timeFormat2 = "mm:ss";
-  static const timeFormat3 = "hh:mm";
-  static const timeFormat4 = "hh";
+  static const timeFormat3 = "hh:mm aa";
 
   static const TOD_AM = "AM",
       TOD_PM = "PM";

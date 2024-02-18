@@ -1,6 +1,7 @@
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chat_app_with_myysql/model/group_messages_model.dart';
+import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
@@ -96,15 +97,14 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime dateTime=DateTime.parse(widget.model.createdAt!);
     return widget.model.media!.type == "none"
-        ? textWidget(dateTime)
+        ? textWidget()
         : widget.model.media!.type == "audio"
-        ? audioWidget(dateTime):  widget.model.media!.type=="video"? videoWidget(dateTime)
-        : imageWidget(dateTime);
+        ? audioWidget():  widget.model.media!.type=="video"? videoWidget()
+        : imageWidget();
   }
 
-  Widget textWidget(DateTime dateTime) {
+  Widget textWidget() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -126,16 +126,24 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
                   maxWidth: MediaQuery.of(context).size.width/1.5,
                 ),
               ),
-              myText(text: DateFormat('HH:mm').format(dateTime),
-                size: 11,
-                color: Colors.black38,)
+              buildDate(),
             ],),
         ),
       ),
     );
   }
 
-  Widget imageWidget(DateTime dateTime) {
+  Widget buildDate(){
+    return myText(//text: DateFormat('HH:mm').format(dateTime),
+      text: DateTimeManager.getFormattedDateTime(
+          widget.model.createdAt!,
+          format:DateTimeManager.timeFormat3,
+          format2: DateTimeManager.dateTimeFormat),
+      size: 11,
+      color: Colors.black38,);
+  }
+
+  Widget imageWidget() {
     return Padding(
         padding: const EdgeInsets.all(5.0),
         child: Container(
@@ -170,17 +178,13 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(6.0),
-                      child: myText(
-                        text: DateFormat('HH:mm').format(dateTime),
-                        size: 11,
-                        color: Colors.black38,
-                      ),
+                      child: buildDate(),
                     )
                   ],
                 ))));
   }
 
-  Widget audioWidget(DateTime dateTime){
+  Widget audioWidget(){
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -223,9 +227,7 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0,bottom: 2.0),
-              child: myText(text: DateFormat('HH:mm').format(dateTime),
-                size: 11,
-                color: Colors.black38,),
+              child: buildDate(),
             )
           ],
         ),
@@ -233,7 +235,8 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
     );
   }
 
-  Widget videoWidget(DateTime dateTime) {
+
+  Widget videoWidget() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -264,9 +267,7 @@ class _GroupChatHolderState extends State<GroupChatHolder> {
                           strokeWidth: 2.0))),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0,bottom: 2.0),
-                child: myText(text: DateFormat('HH:mm').format(dateTime),
-                  size: 11,
-                  color: Colors.black38,),
+                child: buildDate(),
               )
             ],
           )

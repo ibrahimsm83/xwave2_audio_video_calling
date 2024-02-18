@@ -84,10 +84,11 @@ class SocketService {
 class SocketEvent {
   static const REGISTER = 'register';
   static const AUDIO_CALL = "incoming_audio_call",
-      VIDEO_CALL = "incoming_video_call",
-      HANDLE_CALL_EVENT="handleCall",
-      CALL_ACCEPTED="call_accepted",
-      CALL_REJECTED="call_rejected",CALL_ENDED="call_ended";
+      VIDEO_CALL = "incoming_video_call",PARTICIPANTS_ADDED="participants_added",
+      HANDLE_CALL_EVENT="handleCall";
+      //CALL_ACCEPTED="call_accepted",
+    //  CALL_REJECTED="call_rejected",CALL_ENDED="call_ended"
+
   static const CHAT_LIST_UPDATE="chatListUpdate";
 
   ///GroupChat

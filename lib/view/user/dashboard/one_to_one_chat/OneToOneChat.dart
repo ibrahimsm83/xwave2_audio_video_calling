@@ -12,7 +12,6 @@ import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
-import 'package:chat_app_with_myysql/view/user/dashboard/OnetoOneCall/VideoCallForCaller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
 import 'package:chat_app_with_myysql/widget/ChatHolder.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
@@ -27,7 +26,6 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import '../OnetoOneCall/MakingAudioCall.dart';
 
 class OneToOneChat extends StatefulWidget {
 

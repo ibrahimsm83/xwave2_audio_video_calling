@@ -106,15 +106,16 @@ class AppDialog {
 
   static Future<T?> showBottomPanel<T>(
       BuildContext context,
-      Widget widget,
+      Widget widget,{final bool isDismissible=true,}
       ) {
     var media = MediaQuery.of(Get.context!);
     return showModalBottomSheet<T>(
         context: context,
         backgroundColor: AppColor.colorTransparent,
-        enableDrag: false,
+        enableDrag: false,isDismissible: isDismissible,
         isScrollControlled: true,
         useSafeArea: false,
+        elevation: 0,
         //constraints: BoxConstraints.tight(Size.fromHeight(AppSizer.getPerHeight(1))),
         builder: (con) {
           return Padding(

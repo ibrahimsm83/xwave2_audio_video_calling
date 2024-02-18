@@ -6,6 +6,7 @@ import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
+import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -87,7 +88,9 @@ class ChatController extends GetxController {
             url: url,
             lati: lati,
             longi: longi,
-            time: time,
+            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+                format: DateTimeManager.dateTimeFormat,
+                format2: DateTimeManager.dateTimeFormat24_2),
             sender: sender,
             receiver: receiver));
       });
@@ -174,7 +177,9 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
             url: url,
             lati: lati,
             longi: longi,
-            time: time,
+            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+                format: DateTimeManager.dateTimeFormat,
+                format2: DateTimeManager.dateTimeFormat24_2),
             sender: senderUser,
             receiver: receiverUser));
         scrolList(scrollController);
@@ -258,7 +263,9 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
             url: url,
             lati: lati,
             longi: longi,
-            time: time,
+            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+                format: DateTimeManager.dateTimeFormat,
+                format2: DateTimeManager.dateTimeFormat24_2),
             sender: senderUser,
             receiver: receiverUser));
         print("-------------");
@@ -390,7 +397,9 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         url: url,
         lati: lati,
         longi: longi,
-        time: time,
+        time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+            format: DateTimeManager.dateTimeFormat,
+            format2: DateTimeManager.dateTimeFormat24_2),
         sender: senderUser,
         receiver: receiverUser));
     scrolList(scrollController);
@@ -439,7 +448,10 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         url: url,
         lati: lati,
         longi: longi,
-        time: time,
+        //time: time,
+        time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+            format: DateTimeManager.dateTimeFormat,
+            format2: DateTimeManager.dateTimeFormat24_2),
         sender:
         User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
         receiver: User_model(
@@ -518,7 +530,10 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
           url: url,
           lati: lati,
           longi: longi,
-          time: time,
+         // time: time,
+          time: DateTimeManager.getFormattedDateTime(time,isutc: true,
+              format: DateTimeManager.dateTimeFormat,
+              format2: DateTimeManager.dateTimeFormat24_2),
           sender: senderUser,
           receiver: receiverUser));
       print("-------------");

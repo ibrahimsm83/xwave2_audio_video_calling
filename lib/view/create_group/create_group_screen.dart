@@ -520,12 +520,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context!).size.width * 0.05, vertical: 8.0),
       child: CustomButton(
-          color: color!,
+          bgColor: color!,
           text: text ?? "",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
+          textColor: AppColor.colorWhite,fontsize: 14,
           onTap: onTap),
     );
   }

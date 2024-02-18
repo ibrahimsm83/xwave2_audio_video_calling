@@ -3,6 +3,7 @@ class AppDimen{
   static const double APPBAR_HORZ_PADDING=20;
   static const double LOGIN_PADDING_HORZ=20;
   static const double DASHBOARD_PADDING_HORZ=LOGIN_PADDING_HORZ;
+  static const double LOGIN_BUTTON_VERT_PADDING=12;
 
   static const double LOGIN_APPBAR_HEIGHT=60;
   static const double DASHBOARD_APPBAR_HEIGHT=LOGIN_APPBAR_HEIGHT;
@@ -13,6 +14,9 @@ class AppDimen{
 
   static const double CON_RADIUS=20;
   static const double BOTTOM_SHEET_RADIUS=0;
+  static const double LOGIN_BUTTON_RADIUS=6;
+
+  static const double FONT_BUTTON=14;
 
   static const double CONTROLS_BOTTOM=20;
 

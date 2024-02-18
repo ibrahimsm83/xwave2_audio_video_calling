@@ -1,12 +1,11 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:agora_token_service/agora_token_service.dart';
+import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../view/user/dashboard/OnetoOneCall/RunningAudioCall.dart';
 
 class CallService extends GetxService{
   late RtcEngine _engine;
@@ -19,6 +18,8 @@ class CallService extends GetxService{
   bool _isAudioMuted=false;
   bool _isVideoMuted=false;
   bool _loudSpeaker=false;
+
+  final Map<int,User_model> joinedUsers={};
 
   CallService({required this.call,required this.callEventHandler,}){
     _loudSpeaker=(call.type==VoiceCall.TYPE_VIDEO);
@@ -38,19 +39,17 @@ class CallService extends GetxService{
     print("engine initilized");
     _addListeners();
      // await _engine.enableWebSdkInteroperability(true);
-   // await _engine.setEnableSpeakerphone(_loudSpeaker);
    // await _engine.setChannelProfile(ChannelProfileType.channelProfileCommunication);
     await _engine.setClientRole(role:ClientRoleType.clientRoleBroadcaster);
+
     if(call.type==VoiceCall.TYPE_VIDEO) {
       await _engine.enableVideo();
     }
+    await _engine.setDefaultAudioRouteToSpeakerphone(_loudSpeaker);
     await _engine.startPreview();
     //await _engine.enableLocalVideo(true);
     print("preview started");
     await _joinChannel();
-    await _engine.setEnableSpeakerphone(_loudSpeaker);
-
-
   }
 
   void enableVideo(){
@@ -63,7 +62,7 @@ class CallService extends GetxService{
 
 
   void destroy() async{
-    call.guest.num_id=0;
+   // call.guest.num_id=0;
     await _engine.leaveChannel();
     await _engine.release();
    // _engine.unregisterEventHandler(eventHandler);
@@ -151,6 +150,7 @@ class CallService extends GetxService{
       onFirstRemoteVideoFrame: (con,id,_,__,___){
         print("firstRemoteVideoFramePublished $con $id $_ $__ $___");
       },
+
 /*        firstRemoteAudioFrame: (uid,elapsed){
           print("firstRemoteAudioFrame: $uid");
         },
@@ -173,15 +173,18 @@ class CallService extends GetxService{
         //  _engine.joinChannelWithUserAccount(call.token, call.channel, info);
       },
       onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-        debugPrint("remote user $remoteUid joined");
+        debugPrint("remote user joined $remoteUid joined ${joinedUsers.length}");
         callEventHandler.onUserJoined(remoteUid);
       },
       onUserInfoUpdated: (uid,info){
-        print("userInfoUpdated: $uid ${info.toJson()}");
+        joinedUsers[uid]=User_model.empty(id: info.userAccount!,);
+        print("userInfoUpdated: $uid ${info.toJson()} ${joinedUsers.length}");
       },
       onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
-        debugPrint("remote user $remoteUid left channel");
+
+        joinedUsers.remove(remoteUid);
         callEventHandler.onUserLeave(remoteUid);
+        debugPrint("remote user left $remoteUid left channel ${joinedUsers.length}");
       },
       onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
         debugPrint('[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
@@ -234,3 +237,9 @@ class CallService extends GetxService{
 
 
 }
+
+
+final role = RtcRole.publisher;
+final expirationInSeconds = 3600;
+final currentTimestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+final expireTimestamp = currentTimestamp + expirationInSeconds;

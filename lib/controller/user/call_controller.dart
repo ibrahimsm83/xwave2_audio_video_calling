@@ -9,6 +9,7 @@ import 'package:chat_app_with_myysql/service/audio.dart';
 import 'package:chat_app_with_myysql/service/call_service.dart';
 import 'package:chat_app_with_myysql/service/repository/call_repository.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
+import 'package:chat_app_with_myysql/util/helper_functions.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/call/calling/call_screen.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,18 @@ class CallController extends GetxController implements CallEventHandler {
   bool get isLoudSpeakerOn => _callService?.onLoudSpeaker ?? true;
 
   final MyAudioPlayer _audioPlayer = MyAudioPlayer();
+
+  List<int> getParticipantsList() {
+    return _callService?.joinedUsers.keys.toList() ?? [];
+  }
+
+  List<User_model> getParticipantsUsers() {
+    return _callService?.joinedUsers.values.toList() ?? [];
+  }
+
+  User_model? getParticipant(int id) {
+    return _callService?.joinedUsers[id];
+  }
 
   @override
   void onInit() {
@@ -75,10 +88,9 @@ class CallController extends GetxController implements CallEventHandler {
     }
   }
 
-  void _initCallService() async{
+  void _initCallService() async {
     _callService = CallService(call: _currentCall!, callEventHandler: this);
     await _callService!.init();
-    //update();
   }
 
   void _destroyCallService() {
@@ -90,7 +102,7 @@ class CallController extends GetxController implements CallEventHandler {
   }
 
   void _initiateCallTimer() {
-    _timer = Timer(
+    _timer ??= Timer(
         const Duration(milliseconds: AppInteger.INCOMING_CALL_TIMEOUT), () {
       if (onCall && _currentCall!.status == VoiceCall.STATUS_IDLE) {
         endCall(notify: false);
@@ -100,16 +112,18 @@ class CallController extends GetxController implements CallEventHandler {
 
   void _cancelCallTimer() {
     _timer?.cancel();
+    _timer = null;
   }
 
   void _initiateElapsedTimer() {
-    _elapsed_timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _elapsed_timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
       _elapsed_time.value = timer.tick;
     });
   }
 
   void _cancelElapsedTimer() {
     _elapsed_timer?.cancel();
+    _elapsed_timer = null;
     _elapsed_time.value = 0;
   }
 
@@ -154,8 +168,11 @@ class CallController extends GetxController implements CallEventHandler {
     return _callService!.localView();
   }
 
-  Widget renderRemoteView(int id,{Key? key,}) {
-    return _callService!.remoteView(id,key: key);
+  Widget renderRemoteView(
+    int id, {
+    Key? key,
+  }) {
+    return _callService!.remoteView(id, key: key);
   }
 
   void videoCall(User_model receiver) {
@@ -193,7 +210,9 @@ class CallController extends GetxController implements CallEventHandler {
   void receiveCall() async {
     if (await _checkForPermission()) {
       _updateCallStatus(VoiceCall.STATUS_CONNECTING);
-      postAction(_currentCall!.status!);
+      if (!_currentCall!.isGroup) {
+        postAction(_currentCall!.status!);
+      }
       /*_notificationService.removeNotification(VoiceCall.CALL_ID);
       _database.removeCurrentCall();*/
       _cancelCallTimer();
@@ -219,22 +238,28 @@ class CallController extends GetxController implements CallEventHandler {
   void endCall({bool notify = true}) async {
     print("call ended");
     if (onCall) {
-      _currentCall!.status = VoiceCall.STATUS_ENDED;
-      if (notify) {
-        await postAction(_currentCall!.status!);
-      }
-      if (!_currentCall!.isDialed) {
-        /*   print("call is not dialed");
+      if (!_currentCall!.isEnded) {
+        _updateCallStatus(VoiceCall.STATUS_ENDED);
+        if (notify) {
+          if (!_currentCall!.isGroup) {
+            await postAction(_currentCall!.status!);
+          }
+        }
+        if (!_currentCall!.isDialed) {
+          /*   print("call is not dialed");
         _notificationService.removeNotification(VoiceCall.CALL_ID);
         _database.removeCurrentCall();*/
-      }
-      _stopCallSound();
-      _cancelCallTimer();
-      _destroyCallService();
-      _cancelElapsedTimer();
-      _currentCall = null;
-      if (Get.currentRoute == CallScreen.route) {
-        AppNavigator.pop();
+        }
+        _stopCallSound();
+        _cancelCallTimer();
+        _destroyCallService();
+        _cancelElapsedTimer();
+        await Future.delayed(const Duration(seconds: 1));
+        _currentCall = null;
+        AppNavigator.popUntil(CallScreen.route);
+        if (Get.currentRoute == CallScreen.route) {
+          AppNavigator.pop();
+        }
       }
     }
   }
@@ -242,8 +267,6 @@ class CallController extends GetxController implements CallEventHandler {
   // handles at receiver side
   void handleIncomingCall(VoiceCall call,
       {bool shownotification = true, bool savecall = true}) {
-    // if(onCall) {
-    print("handle call: $onCall");
     if (!onCall) {
       if (call.isIdle) {
         _currentCall = call;
@@ -253,21 +276,23 @@ class CallController extends GetxController implements CallEventHandler {
         if (shownotification) {
           showCallNotification(_currentCall!, _notificationService);
         }*/
-        print("going to call screen");
         AppNavigator.navigateTo(CallScreen());
         _initiateCallTimer();
       }
     } else {
-      print("call id: ${call.id == _currentCall!.id}");
       if ((call.id == _currentCall!.id)) {
         if (!call.isGroup) {
           if (call.isConnecting) {
-            if (currentCall!.isDialed) {
+            if (currentCall!.isDialed //&& getParticipantsList().isEmpty
+                ) {
               _joinCall();
             }
           } else if (call.isEnded) {
             endCall(notify: false);
           }
+        } else {
+          _currentCall!.participants = call.participants;
+          update();
         }
       }
     }
@@ -292,18 +317,46 @@ class CallController extends GetxController implements CallEventHandler {
 
   @override
   void onUserJoined(int id) {
-    currentCall!.guest.num_id = id;
-    _setCallConnected();
-   // _callService?.enableVideo();
+    final int length = getParticipantsList().length;
+    if (length == 1) {
+      _setCallConnected();
+    } else if (length > 1) {
+      currentCall!.category = VoiceCall.CATEGORY_GROUP;
+    }
+    update();
+    // _callService?.enableVideo();
   }
 
   @override
   void onUserLeave(int id) {
-    // TODO: implement onUserLeave
+    final int length = getParticipantsList().length;
+    if (length <= 0) {
+      endCall(notify: false);
+    } else {
+      if (length <= 1) {
+        // currentCall!.category = VoiceCall.CATEGORY_SINGLE;
+      }
+      update();
+    }
   }
 
   @override
   void onSelfJoin() {
-    // TODO: implement onSelfJoin
+    if (currentCall!.isGroup) {
+      _setCallConnected();
+    }
+  }
+
+  Future<void> inviteCallParticipants(List<String> ids) async {
+    if (currentCall != null && currentCall!.id != null) {
+      AppLoader.showLoader();
+      final String token = await getToken_praf();
+      bool status = await callRepository.inviteCallParticipants(
+          token, currentCall!.id!, ids);
+      AppLoader.dismissLoader();
+      if (status) {
+        AppNavigator.pop();
+      }
+    }
   }
 }

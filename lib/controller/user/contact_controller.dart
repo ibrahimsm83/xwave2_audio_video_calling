@@ -12,7 +12,7 @@ import 'package:chat_app_with_myysql/model/User_model.dart';
 
 class ContactController extends GetxController {
   final Rx<PageModel<User_model>> users = PageModel<User_model>().obs;
-final Rx<bool> isLoading=false.obs;
+  final Rx<bool> isLoading = false.obs;
   final ContactRepository contactRepository = ContactRepository();
 
   void initialLoadApiContacts() async {
@@ -22,10 +22,10 @@ final Rx<bool> isLoading=false.obs;
   }
 
   Future<void> loadApiContacts() async {
-if(this.users.value.data !=null){
-  this.users.value = PageModel();
-}
-    isLoading.value=true;
+    if (this.users.value.data != null) {
+      this.users.value = PageModel();
+    }
+    isLoading.value = true;
     final List<Map<String, String>> map = [];
     List<User_model> users =
         await MyContactsService().getPhoneContacts(onTask: (user) {
@@ -43,7 +43,7 @@ if(this.users.value.data !=null){
         this.users.value = list;
       }
     });
-    isLoading.value=false;
+    isLoading.value = false;
   }
 
   void refreshContacts() {

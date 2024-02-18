@@ -177,6 +177,7 @@ class _MessagesState extends State<Messages> {
         await Permission.contacts.request();
         bool b = await Permission.contacts.isGranted;
         if (b) next_page(Contacts());
+        AppNavigator.navigateTo(Contacts());
       },
       backgroundColor: appYellow,
       child: Icon(

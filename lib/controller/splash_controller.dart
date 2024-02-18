@@ -14,6 +14,8 @@ class SplashController extends GetxController{
     await Future.delayed(const Duration(seconds: AppInteger.SPLASH_DURATION_SEC));
     bool? b=await getLogin_praf();
     if(b==true){
+      final String token = await getToken_praf();
+      print("token is: $token");
       _goToDashboard();
     }
     else{

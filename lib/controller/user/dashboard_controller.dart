@@ -30,6 +30,7 @@ class DashboardController extends GetxController with SocketMessageHandler{
   @override
   void onInit() {
     socketService.connect(this,events: [SocketEvent.AUDIO_CALL,SocketEvent.VIDEO_CALL,
+     SocketEvent.PARTICIPANTS_ADDED,
      // SocketEvent.CHAT_LIST_UPDATE
     ]);
     super.onInit();
@@ -60,21 +61,27 @@ class DashboardController extends GetxController with SocketMessageHandler{
   @override
   void onEvent(String name, data) {
     super.onEvent(name, data);
-    print("-----------$name");
-    print("-----------$data");
     if(name==SocketEvent.AUDIO_CALL || name==SocketEvent.VIDEO_CALL){
       VoiceCall call=VoiceCall.fromMap(data,side: VoiceCall.SIDE_RECEIVER,
           dialer: User_model.fromCallJson(data["from"]),receiver: user_model,
           status: VoiceCall.STATUS_IDLE,
+          type: (name==SocketEvent.AUDIO_CALL)?VoiceCall.TYPE_AUDIO:VoiceCall.TYPE_VIDEO,
           category: VoiceCall.CATEGORY_SINGLE);
-      call.id=data["channelName"];
-      if(name==SocketEvent.AUDIO_CALL){
-        call.type=VoiceCall.TYPE_AUDIO;
-      }
-      else{
-        call.type=VoiceCall.TYPE_VIDEO;
-      }
-
+      call.id=call.channel;
+      callController.handleIncomingCall(call);
+    }
+    else if(name==SocketEvent.PARTICIPANTS_ADDED){
+      // group call
+      var map=Map<String,User_model>.fromIterable(data["updatedParticipants"],key: (val){
+        return val["_id"];
+      },value: (val){
+        return User_model.fromCallJson(val);
+      });
+      VoiceCall call=VoiceCall.fromMap(data,side: VoiceCall.SIDE_RECEIVER,
+          status: VoiceCall.STATUS_IDLE,type: VoiceCall.TYPE_AUDIO,
+          user: user_model,participants: map,
+          category: VoiceCall.CATEGORY_GROUP);
+      call.channel=call.id;
       callController.handleIncomingCall(call);
     }
     else if(name==SocketEvent.HANDLE_CALL_EVENT){

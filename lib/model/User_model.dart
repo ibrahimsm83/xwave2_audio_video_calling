@@ -4,11 +4,11 @@ class User_model {
   String? access_token;
   bool? profile_completed;
 
-  int? _num_id;
+ // int? _num_id;
 
-  set num_id(int id) => _num_id=id;
+ // set num_id(int id) => _num_id=id;
 
-  int get num_id => _num_id??0;
+ // int get num_id => _num_id??0;
 
   //int get num_id=>int.tryParse(id,radix: 16)??0;
 

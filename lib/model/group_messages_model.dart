@@ -1,3 +1,5 @@
+import 'package:chat_app_with_myysql/util/datetime.dart';
+
 class GroupMessagesModel {
   List<GroupMessages>? groupMessages;
   String? groupUpdatedAt;
@@ -58,7 +60,10 @@ class GroupMessages {
     chatType = json['chatType'];
     content = json['content'];
     deliveryStatus = json['deliveryStatus'];
-    createdAt = json['createdAt'];
+   // createdAt = json['createdAt'];
+    createdAt = DateTimeManager.getFormattedDateTime(json['createdAt'],isutc: true,
+        format: DateTimeManager.dateTimeFormat,
+        format2: DateTimeManager.dateTimeFormat24_2);
     updatedAt = json['updatedAt'];
     iV = json['__v'];
   }
