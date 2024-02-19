@@ -231,7 +231,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         Get.snackbar('Error', 'Enter Group Name or Select Users',
                             backgroundColor: Colors.red);
                       }
-                      //Navigator.pushNamed(context, CustomRouteNames.kWorkingHourScreenRoute);
                     }),
               ),
             ],

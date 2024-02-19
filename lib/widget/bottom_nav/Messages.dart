@@ -8,20 +8,20 @@ import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
+import 'package:chat_app_with_myysql/util/assets_manager.dart';
 import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/util/helper_functions.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
+import 'package:chat_app_with_myysql/view/story_view/open_story_screen.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Contacts.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/settings/settings.dart';
-import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/widget/my_profile_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shimmer/shimmer.dart';
@@ -41,6 +41,7 @@ class _MessagesState extends State<Messages> {
   ApiService apiService = ApiService();
   bool isLoading = false;
   String message = "hello";
+  bool isStatusList=true;
 
   @override
   void initState() {
@@ -60,13 +61,113 @@ class _MessagesState extends State<Messages> {
         child: ListView(
           children: [
             header(),
+            Visibility(
+              visible: isStatusList,
+                child: users()),
             chatRoomContainer(),
           ],
         ),
       ),
     );
   }
+  Widget users() {
+    return Container(
+      height: 120,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 10,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: () {
+             // Navigator.pushNamed(context, Routes.OpenStoryViewRoute);
+            },
+            child: Column(children: [
+              Container(
+                height: 70,
+                width: 70,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+                child: Stack(
+                  children: [
+                    InkWell(
+                      onTap: (){
+                        print("object");
+                        next_page(OpenStoryView());
+                       // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Container(
+                          decoration:
+                          //  _imagePickerUtility.image != null
+                          //     ? BoxDecoration(
+                          //         border: Border.all(
+                          //             color: AppColors.primary, width: 4.0),
+                          //         image: DecorationImage(
+                          //             image: FileImage(
+                          //                 File(_imagePickerUtility.image!)),
+                          //             fit: BoxFit.cover),
+                          //         shape: BoxShape.circle,
+                          //       )
+                          //     :
+                          BoxDecoration(
+                            border: Border.all(
+                                color: AppColor.appYellow, ),
+                            image: const DecorationImage(
+                                image: AssetImage(ImageAssets.person1),
+                                fit: BoxFit.cover),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
 
+
+                  Visibility(
+                    visible: index==0,
+                    child: InkWell(
+                      onTap: () async {
+                        print("button Tapped...");
+                        // var selectimageFile = await _imagePickerUtility
+                        //     .pickImageWithReturn(context);
+
+                        // setState(() {});
+                        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const CreateMyProfilePg()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color:Colors.black, width: 2.0),
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(child: Icon(Icons.add,size: 15,)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+
+                ),
+              ),
+              SizedBox(height: 4.0),
+              Text("jhon smith",
+                  style:TextStyle(color: Colors.white,fontSize: 10)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
   Widget header() {
     return Row(
       children: [

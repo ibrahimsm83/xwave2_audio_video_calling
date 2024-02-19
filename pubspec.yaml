@@ -57,6 +57,7 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   shimmer: ^3.0.0
+  story: ^1.1.0
 
 
   agora_rtc_engine: ^6.2.2
