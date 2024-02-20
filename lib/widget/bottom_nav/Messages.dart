@@ -15,6 +15,7 @@ import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/view/story_view/open_story_screen.dart';
+import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Contacts.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
@@ -23,6 +24,7 @@ import 'package:chat_app_with_myysql/widget/my_profile_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -38,15 +40,24 @@ class Messages extends StatefulWidget {
 class _MessagesState extends State<Messages> {
   final DashboardController dashboardController =
       Get.find<DashboardController>();
+  final StoryController  storyViewController = Get.put(StoryController());
+
+  bool uploading = false;
+  bool next = false;
+  final List<XFile> imageFileList = [];
+
+  ///Choose MultiImages
+
   ApiService apiService = ApiService();
   bool isLoading = false;
   String message = "hello";
-  bool isStatusList=true;
+  bool isStatusList = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    storyViewController.getStoryApi();
     fetchRooms();
     getUserInfo();
     registerEvent('chatListUpdate', roomsUpdateListner);
@@ -54,6 +65,7 @@ class _MessagesState extends State<Messages> {
 
   @override
   Widget build(BuildContext context) {
+    // print("Selected Images--------${imageFileList}");
     return Scaffold(
       backgroundColor: appBlack,
       floatingActionButton: flottingBtn(),
@@ -61,79 +73,86 @@ class _MessagesState extends State<Messages> {
         child: ListView(
           children: [
             header(),
-            Visibility(
-              visible: isStatusList,
-                child: users()),
+            Visibility(visible: isStatusList, child: users()),
             chatRoomContainer(),
           ],
         ),
       ),
     );
   }
+
   Widget users() {
     return Container(
       height: 120,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 10,
+        itemCount: 2,
         itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () {
-             // Navigator.pushNamed(context, Routes.OpenStoryViewRoute);
-            },
-            child: Column(children: [
-              Container(
-                height: 70,
-                width: 70,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: Stack(
-                  children: [
-                    InkWell(
-                      onTap: (){
-                        print("object");
-                        next_page(OpenStoryView());
-                       // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(0.0),
-                        child: Container(
-                          decoration:
-                          //  _imagePickerUtility.image != null
-                          //     ? BoxDecoration(
-                          //         border: Border.all(
-                          //             color: AppColors.primary, width: 4.0),
-                          //         image: DecorationImage(
-                          //             image: FileImage(
-                          //                 File(_imagePickerUtility.image!)),
-                          //             fit: BoxFit.cover),
-                          //         shape: BoxShape.circle,
-                          //       )
-                          //     :
-                          BoxDecoration(
-                            border: Border.all(
-                                color: AppColor.appYellow, ),
-                            image: const DecorationImage(
-                                image: AssetImage(ImageAssets.person1),
-                                fit: BoxFit.cover),
-                            shape: BoxShape.circle,
+          child: Column(children: [
+            Container(
+              height: 70,
+              width: 70,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: Stack(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      print("object");
+                      next_page(OpenStoryView());
+                      // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: Container(
+                        decoration:
+                            //  _imagePickerUtility.image != null
+                            //     ? BoxDecoration(
+                            //         border: Border.all(
+                            //             color: AppColors.primary, width: 4.0),
+                            //         image: DecorationImage(
+                            //             image: FileImage(
+                            //                 File(_imagePickerUtility.image!)),
+                            //             fit: BoxFit.cover),
+                            //         shape: BoxShape.circle,
+                            //       )
+                            //     :
+                            BoxDecoration(
+                          border: Border.all(
+                            color: AppColor.appYellow,
                           ),
+                          image: const DecorationImage(
+                              image: AssetImage(ImageAssets.person1),
+                              fit: BoxFit.cover),
+                          shape: BoxShape.circle,
                         ),
                       ),
                     ),
-
-
+                  ),
                   Visibility(
-                    visible: index==0,
+                    visible: index == 0,
                     child: InkWell(
-                      onTap: () async {
+                      onTap: ()  async {
                         print("button Tapped...");
                         // var selectimageFile = await _imagePickerUtility
                         //     .pickImageWithReturn(context);
+                        // chooseImage();
+                        if(storyViewController.isOwnStatus.value){
+                          print("navigate to story view page");
+                          print(storyViewController.ownStatusList.value);
+                          next_page(OpenStoryView(status: storyViewController.ownStatusList.value!));
+                        }else{
+                          final List<XFile>? selectedImages = await ImagePicker().pickMultiImage();
+                          if (selectedImages!.isNotEmpty) {
+                            storyViewController.addStoryApi(images: selectedImages,text: "");
+                            imageFileList!.addAll(selectedImages!);
+                          }
+                          setState(() {});
+                        }
 
-                        // setState(() {});
+
                         // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const CreateMyProfilePg()));
                       },
                       child: Padding(
@@ -144,30 +163,33 @@ class _MessagesState extends State<Messages> {
                             height: 20,
                             width: 20,
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color:Colors.black, width: 2.0),
+                              border:
+                                  Border.all(color: Colors.black, width: 2.0),
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child: Center(child: Icon(Icons.add,size: 15,)),
+                            child: Center(
+                                child: Icon(
+                              Icons.add,
+                              size: 15,
+                            )),
                           ),
                         ),
                       ),
                     ),
                   )
                 ],
-
-                ),
               ),
-              SizedBox(height: 4.0),
-              Text("jhon smith",
-                  style:TextStyle(color: Colors.white,fontSize: 10)),
-            ]),
-          ),
+            ),
+            SizedBox(height: 4.0),
+            Text("jhon smith",
+                style: TextStyle(color: Colors.white, fontSize: 10)),
+          ]),
         ),
       ),
     );
   }
+
   Widget header() {
     return Row(
       children: [
@@ -301,10 +323,9 @@ class _MessagesState extends State<Messages> {
                                       format: DateTimeManager.timeFormat3,
                                     ),
                                     style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontFamily: "Roboto",
-                                        fontSize: 12
-                                    )),
+                                        color: Colors.grey,
+                                        fontFamily: "Roboto",
+                                        fontSize: 12)),
                                 Container(
                                     decoration: const BoxDecoration(
                                       color: AppColor.appYellow,
@@ -348,6 +369,7 @@ class _MessagesState extends State<Messages> {
   }
 
   List<OnetoOneChatRoomModel> chatRoomsModels = [];
+
   fetchRooms() async {
     setState(() {
       isLoading = true;
