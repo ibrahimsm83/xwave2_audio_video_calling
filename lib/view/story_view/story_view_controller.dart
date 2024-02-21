@@ -8,7 +8,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class StoryController extends GetxController {
+
    RxList<StoryViewModel>  ownStatusList=<StoryViewModel>[].obs;
+
+   List<String> userIdsList=[];
   final Rx<bool> isLoading=false.obs;
   final Rx<bool> isOwnStatus=false.obs;
   final StoryViewRepository storyViewRepository = StoryViewRepository();
@@ -31,6 +34,24 @@ class StoryController extends GetxController {
     });
     isLoading.value=false;
   }
+///Get All Users status
+  // void getUserStoryApi() async {
+  //   final String token = await getToken_praf();
+  //   isLoading.value=true;
+  //   await storyViewRepository.getUsersStoryAPI(token).then((list) {
+  //     if (list.isNotEmpty) {
+  //       print("------my list-----");
+  //       isOwnStatus.value=true;
+  //       print(list);
+  //       ownStatusList.value = list;
+  //     }
+  //     else{
+  //       isOwnStatus.value=false;
+  //       AppMessage.showMessage("No Status Found");
+  //     }
+  //   });
+  //   isLoading.value=false;
+  // }
 
   void addStoryApi({ String? text, required List<XFile> images}) async {
     final String token = await getToken_praf();

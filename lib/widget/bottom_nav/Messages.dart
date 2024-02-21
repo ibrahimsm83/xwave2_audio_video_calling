@@ -40,7 +40,9 @@ class Messages extends StatefulWidget {
 class _MessagesState extends State<Messages> {
   final DashboardController dashboardController =
       Get.find<DashboardController>();
-  final StoryController  storyViewController = Get.put(StoryController());
+  final StoryController storyViewController = Get.find<StoryController>();
+
+  // final StoryController storyViewController = Get.put(StoryController());
 
   bool uploading = false;
   bool next = false;
@@ -65,7 +67,8 @@ class _MessagesState extends State<Messages> {
 
   @override
   Widget build(BuildContext context) {
-    // print("Selected Images--------${imageFileList}");
+    print("UserIdList for get status users");
+    print(storyViewController.userIdsList);
     return Scaffold(
       backgroundColor: appBlack,
       floatingActionButton: flottingBtn(),
@@ -84,109 +87,161 @@ class _MessagesState extends State<Messages> {
   Widget users() {
     return Container(
       height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 2,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
-            Container(
-              height: 70,
-              width: 70,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
-              child: Stack(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      print("object");
-                      next_page(OpenStoryView());
-                      // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: Container(
-                        decoration:
-                            //  _imagePickerUtility.image != null
-                            //     ? BoxDecoration(
-                            //         border: Border.all(
-                            //             color: AppColors.primary, width: 4.0),
-                            //         image: DecorationImage(
-                            //             image: FileImage(
-                            //                 File(_imagePickerUtility.image!)),
-                            //             fit: BoxFit.cover),
-                            //         shape: BoxShape.circle,
-                            //       )
-                            //     :
-                            BoxDecoration(
-                          border: Border.all(
-                            color: AppColor.appYellow,
+      child: Row(
+        children: [
+          ownStatusWidget(),
+          SizedBox(width: 10.0),
+          Flexible(
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 4,
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(children: [
+                  Container(
+                    height: 70,
+                    width: 70,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: Stack(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            print("object");
+                            next_page(OpenStoryView(status:storyViewController.ownStatusList,));
+                            // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: AppColor.appYellow,
+                                ),
+                                image: const DecorationImage(
+                                    image: AssetImage(ImageAssets.person1),
+                                    fit: BoxFit.cover),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                           ),
-                          image: const DecorationImage(
-                              image: AssetImage(ImageAssets.person1),
-                              fit: BoxFit.cover),
-                          shape: BoxShape.circle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text("jhon smith",
+                      style: TextStyle(color: Colors.white, fontSize: 10)),
+                ]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget ownStatusWidget() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(children: [
+        Container(
+          height: 70,
+          width: 70,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          child: Stack(
+            children: [
+              InkWell(
+                onTap: () {
+                  print("object");
+                  next_page(OpenStoryView(status:storyViewController.ownStatusList,));
+                  // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: Container(
+                    decoration: dashboardController.user_model != null
+                        ? BoxDecoration(
+                            border: Border.all(color: AppColor.appYellow),
+                            image: DecorationImage(
+                                image: NetworkImage(
+                                    dashboardController.user_model!.avatar),
+                                fit: BoxFit.cover),
+                            shape: BoxShape.circle,
+                          )
+                        : BoxDecoration(
+                            border: Border.all(
+                              color: AppColor.appYellow,
+                            ),
+                            image: const DecorationImage(
+                                image: AssetImage(ImageAssets.person1),
+                                fit: BoxFit.cover),
+                            shape: BoxShape.circle,
+                          ),
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                  print("button Tapped...");
+                  if (storyViewController.isOwnStatus.value) {
+                    print("navigate to story view page");
+                    print(storyViewController.ownStatusList.value);
+                    next_page(OpenStoryView(
+                        status: storyViewController.ownStatusList.value!));
+                  } else {
+                    final List<XFile>? selectedImages =
+                        await ImagePicker().pickMultiImage();
+                    if (selectedImages!.isNotEmpty) {
+                      storyViewController.addStoryApi(
+                          images: selectedImages, text: "");
+                      imageFileList!.addAll(selectedImages!);
+                    }
+                    setState(() {});
+                  }
+                  // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const CreateMyProfilePg()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 2.0),
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Visibility(
+                        visible: !storyViewController.isLoading.value,
+                        child: Center(
+                            child: Icon(
+                          Icons.add,
+                          size: 15,
+                        )),
+                        replacement: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: index == 0,
-                    child: InkWell(
-                      onTap: ()  async {
-                        print("button Tapped...");
-                        // var selectimageFile = await _imagePickerUtility
-                        //     .pickImageWithReturn(context);
-                        // chooseImage();
-                        if(storyViewController.isOwnStatus.value){
-                          print("navigate to story view page");
-                          print(storyViewController.ownStatusList.value);
-                          next_page(OpenStoryView(status: storyViewController.ownStatusList.value!));
-                        }else{
-                          final List<XFile>? selectedImages = await ImagePicker().pickMultiImage();
-                          if (selectedImages!.isNotEmpty) {
-                            storyViewController.addStoryApi(images: selectedImages,text: "");
-                            imageFileList!.addAll(selectedImages!);
-                          }
-                          setState(() {});
-                        }
-
-
-                        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const CreateMyProfilePg()));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4.0),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            height: 20,
-                            width: 20,
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 2.0),
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                                child: Icon(
-                              Icons.add,
-                              size: 15,
-                            )),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 4.0),
-            Text("jhon smith",
-                style: TextStyle(color: Colors.white, fontSize: 10)),
-          ]),
+                ),
+              )
+            ],
+          ),
         ),
-      ),
+        SizedBox(height: 4.0),
+        Text("Me", style: TextStyle(color: Colors.white, fontSize: 10)),
+      ]),
     );
   }
 

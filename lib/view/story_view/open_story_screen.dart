@@ -1,7 +1,10 @@
 import 'package:chat_app_with_myysql/util/assets_manager.dart';
 import 'package:chat_app_with_myysql/view/story_view/model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:story/story_page_view.dart';
+
+import '../../controller/user/controller.dart';
 
 
 
@@ -20,6 +23,7 @@ class StoryModel {
 
 class OpenStoryView extends StatefulWidget {
 
+
   List<StoryViewModel>? status;
    OpenStoryView({Key? key,this.status}) : super(key: key);
 
@@ -29,6 +33,7 @@ class OpenStoryView extends StatefulWidget {
 
 class _OpenStoryViewState extends State<OpenStoryView> {
   late ValueNotifier<IndicatorAnimationCommand> indicatorAnimationController;
+  final DashboardController dashboardController = Get.find<DashboardController>();
 
   // final sampleUsers = [
   //   UserModel(
@@ -100,8 +105,9 @@ class _OpenStoryViewState extends State<OpenStoryView> {
      sampleUsers=[
       UserModel(
           storyList,
-        "User1",
-        ImageAssets.person2
+          dashboardController.user_model!.username,
+        dashboardController.user_model!.avatar,
+        //ImageAssets.person2
       )
     ];
     setState(() {
@@ -148,7 +154,7 @@ class _OpenStoryViewState extends State<OpenStoryView> {
                       width: 32,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(user.imageUrl),
+                          image: NetworkImage(user.imageUrl),
                           fit: BoxFit.cover,
                         ),
                         shape: BoxShape.circle,
@@ -217,12 +223,12 @@ class _OpenStoryViewState extends State<OpenStoryView> {
           ]);
         },
         indicatorAnimationController: indicatorAnimationController,
-        initialStoryIndex: (pageIndex) {
-          if (pageIndex == 0) {
-            return 1;
-          }
-          return 0;
-        },
+        // initialStoryIndex: (pageIndex) {
+        //   if (pageIndex == 0) {
+        //     return 1;
+        //   }
+        //   return 0;
+        // },
         pageLength: sampleUsers.length,
         storyLength: (int pageIndex) {
           return sampleUsers[pageIndex].stories.length;

@@ -30,19 +30,39 @@ class StoryViewRepository {
         }
 
     );
-    return statusList ??[];
+    return statusList;
+  }
+
+  Future<List<StoryViewModel>> getUsersStoryAPI(
+      String token,
+      ) async {
+     List<StoryViewModel>? statusList=[];
+    const String url = AppConfig.DIRECTORY + "user/getAllStatus";
+    print("getApiget own Status url: $url");
+    await Network().get(url, headers: {
+      "Authorization": "Bearer ${token}",
+      'Content-type': 'application/json'
+    }, onSuccess: (val) {
+      print("getApiGroupUsers response: ${val}");
+      var map = jsonDecode(val);
+      for(int i =0;i<map.length;i++){
+        statusList.add(StoryViewModel.fromJson(map[i]));
+      }
+    },
+        onError: (e){
+          print('Failed to load data: ${e}');
+        }
+
+    );
+    return statusList;
   }
 
   Future<dynamic> createStoryApi(String? text, String imagePath, String token,String mediaType) async {
-    print(text);
-    print(imagePath);
-    print(token);
 
     var headers = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'multipart/form-data',
     };
-
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://xwavetechnologies.com/user/uploadStatus'));
     request.fields.addAll(

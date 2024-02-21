@@ -5,6 +5,7 @@ import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/view/auth/Login.dart';
+import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Home.dart';
 import 'package:get/get.dart';
 
@@ -48,6 +49,7 @@ class SplashController extends GetxController{
     AppNavigator.navigateToReplaceAll((){
       Get.put(DashboardController());
       Get.put(ContactController());
+      Get.put(StoryController());
       Get.put(CallController());
       return Home();
     });
