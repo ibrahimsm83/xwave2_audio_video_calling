@@ -38,6 +38,7 @@ class _HomeState extends State<Home> {
 
   void loadData()async{
     ///call contact from device
+    print("Load api called...get usersId .List...");
    await contactController.loadApiContacts();
    //storyController.getStoryApi();
   }

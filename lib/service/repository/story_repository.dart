@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:chat_app_with_myysql/model/group_chat_users_model.dart';
 import 'package:chat_app_with_myysql/service/network.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
+import 'package:chat_app_with_myysql/view/story_view/get_all_status_model.dart';
 import 'package:chat_app_with_myysql/view/story_view/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -33,20 +34,22 @@ class StoryViewRepository {
     return statusList;
   }
 
-  Future<List<StoryViewModel>> getUsersStoryAPI(
+  Future<List<GetAllStatusModel>> getUsersStoryAPI(
       String token,
+     List<String> userIdsList,
       ) async {
-     List<StoryViewModel>? statusList=[];
+     List<GetAllStatusModel>? allUsersStatusList=[];
     const String url = AppConfig.DIRECTORY + "user/getAllStatus";
-    print("getApiget own Status url: $url");
-    await Network().get(url, headers: {
+    print("getApiget All Status url: $url");
+     final String body = jsonEncode({"userIDs": userIdsList});
+    await Network().post(url,body, headers: {
       "Authorization": "Bearer ${token}",
       'Content-type': 'application/json'
     }, onSuccess: (val) {
-      print("getApiGroupUsers response: ${val}");
+      print("-----------------22222getAllStatus response: ${val}");
       var map = jsonDecode(val);
       for(int i =0;i<map.length;i++){
-        statusList.add(StoryViewModel.fromJson(map[i]));
+        allUsersStatusList.add(GetAllStatusModel.fromJson(map[i]));
       }
     },
         onError: (e){
@@ -54,7 +57,7 @@ class StoryViewRepository {
         }
 
     );
-    return statusList;
+    return allUsersStatusList;
   }
 
   Future<dynamic> createStoryApi(String? text, String imagePath, String token,String mediaType) async {

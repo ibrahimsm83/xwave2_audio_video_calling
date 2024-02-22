@@ -14,6 +14,7 @@ import 'package:chat_app_with_myysql/util/helper_functions.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
+import 'package:chat_app_with_myysql/view/story_view/all_users_story_view_screen.dart';
 import 'package:chat_app_with_myysql/view/story_view/open_story_screen.dart';
 import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Contacts.dart';
@@ -60,6 +61,7 @@ class _MessagesState extends State<Messages> {
     // TODO: implement initState
     super.initState();
     storyViewController.getStoryApi();
+    storyViewController.getUserStoryApi();
     fetchRooms();
     getUserInfo();
     registerEvent('chatListUpdate', roomsUpdateListner);
@@ -67,8 +69,7 @@ class _MessagesState extends State<Messages> {
 
   @override
   Widget build(BuildContext context) {
-    print("UserIdList for get status users");
-    print(storyViewController.userIdsList);
+
     return Scaffold(
       backgroundColor: appBlack,
       floatingActionButton: flottingBtn(),
@@ -76,7 +77,7 @@ class _MessagesState extends State<Messages> {
         child: ListView(
           children: [
             header(),
-            Visibility(visible: isStatusList, child: users()),
+            Obx(()=> Visibility(visible: isStatusList, child: users())),
             chatRoomContainer(),
           ],
         ),
@@ -92,9 +93,10 @@ class _MessagesState extends State<Messages> {
           ownStatusWidget(),
           SizedBox(width: 10.0),
           Flexible(
-            child: ListView.builder(
+            child:storyViewController.isUserStatusLoading.value?Center(child: CircularProgressIndicator(),):
+            ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 4,
+              itemCount: storyViewController.allUsersStatusList.length,
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(children: [
@@ -108,9 +110,7 @@ class _MessagesState extends State<Messages> {
                       children: [
                         InkWell(
                           onTap: () {
-                            print("object");
-                            next_page(OpenStoryView(status:storyViewController.ownStatusList,));
-                            // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>const OpenStoryView()));
+                            next_page(OpenUsersStoryView(status:storyViewController.allUsersStatusList[index].statuses,userName:storyViewController.allUsersStatusList[index].username,userAvatar: storyViewController.allUsersStatusList[index].avatar,));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(0.0),
@@ -119,8 +119,8 @@ class _MessagesState extends State<Messages> {
                                 border: Border.all(
                                   color: AppColor.appYellow,
                                 ),
-                                image: const DecorationImage(
-                                    image: AssetImage(ImageAssets.person1),
+                                image:  DecorationImage(
+                                    image: NetworkImage(storyViewController.allUsersStatusList[index].avatar!),
                                     fit: BoxFit.cover),
                                 shape: BoxShape.circle,
                               ),
@@ -131,7 +131,7 @@ class _MessagesState extends State<Messages> {
                     ),
                   ),
                   const SizedBox(height: 4.0),
-                  Text("jhon smith",
+                  Text(storyViewController.allUsersStatusList[index].username??"Jhon",
                       style: TextStyle(color: Colors.white, fontSize: 10)),
                 ]),
               ),
