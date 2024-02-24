@@ -1,0 +1,15 @@
+final String apiUrl='https://xwavetechnologies.com';
+final String sendOTP='https://xwavetechnologies.com/auth/send-otp';
+final String verifyOTP='https://xwavetechnologies.com/auth/verify-otp';
+final String updateInfo='https://xwavetechnologies.com/auth/infoabout';
+final String appInstallUsers='https://xwavetechnologies.com/user/getContactUsers';
+final String createChat1To1='https://xwavetechnologies.com/user/CreateOnetoOneChat';
+final String send1To1Msg='https://xwavetechnologies.com/user/sendmesseges';
+final String sendMessageInGroupMsg='https://xwavetechnologies.com/user/sendMessageInGroup';
+final String fetch1To1chat='https://xwavetechnologies.com/user/FetchAllMessagesOfParticularChat/';
+final String fetcAllMessagesOfParticularGroupChat='https://xwavetechnologies.com/user/FetchAllMessagesOfParticularGroupChat/';
+final String fetch1To1chatRooms='https://xwavetechnologies.com/user/fetchOneToOneChat';
+final String userInfo='https://xwavetechnologies.com/user/getuserinfo';
+final String makeAudioCallApi='https://xwavetechnologies.com/user/startAudioCall';
+final String makeVideoCallApi='https://xwavetechnologies.com/user/startVidoCall';
+final String audioCallActionsApi='https://xwavetechnologies.com/user/handleCallActions';
