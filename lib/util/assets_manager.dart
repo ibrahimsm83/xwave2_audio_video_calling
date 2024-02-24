@@ -12,6 +12,9 @@ class ImageAssets {
   ///Login
   static const String kMoonIcon = "$ICON_PATH/moon.svg";
   static const String kSunIcon = "$ICON_PATH/sun.svg";
+  ///One-To-one-Chat
+
+  static const String kInnerChatBackgroundImage = "$IMAGE_PATH/innerChatBgImage.png";
 //------------------Person Image----------------------------
   static const String person1 = "$IMAGE_PATH/person1.jpg";
   static const String person2 = "$IMAGE_PATH/person2.jpeg";

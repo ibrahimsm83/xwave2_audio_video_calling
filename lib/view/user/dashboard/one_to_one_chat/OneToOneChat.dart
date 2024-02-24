@@ -10,6 +10,7 @@ import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
+import 'package:chat_app_with_myysql/util/assets_manager.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
@@ -108,18 +109,26 @@ class _OneToOneChatState extends State<OneToOneChat> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      body: Obx(()=>
-        Column(children: [
-          myappBar(),
-          chatListWight(),
-          Visibility(
-              visible: !chatController.isMicTapped.value,
-              child:chatOptionsWight(context),
-          replacement:audioRecordingSheetWight(),
-          ),
-        ],),
-      )
+    return Container(
+      decoration:const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(ImageAssets.kInnerChatBackgroundImage),
+        )
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Obx(()=>
+          Column(children: [
+            myappBar(),
+            chatListWight(),
+            Visibility(
+                visible: !chatController.isMicTapped.value,
+                child:chatOptionsWight(context),
+            replacement:audioRecordingSheetWight(),
+            ),
+          ],),
+        )
+      ),
     );
   }
 
