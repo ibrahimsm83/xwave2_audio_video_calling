@@ -9,6 +9,9 @@ class ImageAssets {
   ///Dashboard
   static const String kSearchIcon = "$ICON_PATH/Search.svg";
   static const String kDemoUserImage = "$IMAGE_PATH/profileImage.png";
+  ///Login
+  static const String kMoonIcon = "$ICON_PATH/moon.svg";
+  static const String kSunIcon = "$ICON_PATH/sun.svg";
 //------------------Person Image----------------------------
   static const String person1 = "$IMAGE_PATH/person1.jpg";
   static const String person2 = "$IMAGE_PATH/person2.jpeg";
