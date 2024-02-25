@@ -35,7 +35,6 @@ class _LoginState extends State<Login> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +51,7 @@ class _LoginState extends State<Login> {
                       current: positive,
                       first: false,
                       second: true,
-                      spacing: 2.0,
+                      spacing: 5.0,
                       style: ToggleStyle(
                         borderColor: Colors.transparent,
                         backgroundColor:
@@ -93,7 +92,7 @@ class _LoginState extends State<Login> {
                 ],
               ),
               container(),
-              SizedBox(height: 30),
+               SizedBox(height: 100),
               Image.asset(
                 'images/Logo.png',
                 width: 100,

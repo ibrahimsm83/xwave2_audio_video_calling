@@ -5,8 +5,9 @@ import 'dart:io';
 import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chat_app_with_myysql/controller/user/call_controller.dart';
-import 'package:chat_app_with_myysql/model/ChatModel.dart';
+// import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
+import 'package:chat_app_with_myysql/model/one_to_one_chat_model.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
@@ -131,7 +132,8 @@ class _OneToOneChatState extends State<OneToOneChat> {
       child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Obx(
-            () => Column(
+            () =>
+                Column(
               children: [
                 myappBar(),
                 chatListWight(),
@@ -211,25 +213,24 @@ class _OneToOneChatState extends State<OneToOneChat> {
               controller: chatController.scrollController,
               itemCount: chatController.chatList.length,
               itemBuilder: (context, index) {
-                ChatModel model = chatController.chatList[index];
-                if (model.sender.id == widget.sender.id) {
+                if (chatController.chatList[index].sender?.sId == widget.sender.id) {
                   ///Right
                   return SwipeTo(
-                    onRightSwipe: (message) => replyToMessage(model),
+                    onRightSwipe: (message) => replyToMessage(chatController.chatList[index]),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: chatHolder(
-                          messageModel: model, chatBoxColor: appYellow),
+                          messageModel: chatController.chatList[index], chatBoxColor: appYellow),
                     ),
                   );
                 } else {
                   ///Left
                   return SwipeTo(
-                      onRightSwipe: (message) => replyToMessage(model),
+                      onRightSwipe: (message) => replyToMessage(chatController.chatList[index]),
                       child: Align(
                           alignment: Alignment.centerLeft,
                           child: chatHolder(
-                              messageModel: model,
+                              messageModel:  chatController.chatList[index],
                               chatBoxColor: applightWhite)));
                 }
               },
@@ -328,7 +329,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        replyMessage?.mediaType == "none"
+                        replyMessage?.media!.type == "none"
                             ? Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -341,7 +342,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          replyMessage?.sender.username ?? "",
+                                          replyMessage?.sender!.username ?? "",
                                           style: getRegularStyle(
                                               color: ColorManager.kBlackColor,
                                               fontSize: 16),
@@ -365,7 +366,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                   ],
                                 ),
                             )
-                            : replyMessage?.mediaType == "image"
+                            : replyMessage?.media?.type == "image"
                                 ? Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -378,7 +379,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              replyMessage?.sender.username ??
+                                              replyMessage?.sender?.username ??
                                                   "",
                                               style: getRegularStyle(
                                                   color:
@@ -404,7 +405,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                             decoration: BoxDecoration(
                                                 image: DecorationImage(
                                                     image: NetworkImage(
-                                                      replyMessage!.url,
+                                                      replyMessage!.media!.url!,
                                                     ),
                                                     fit: BoxFit.cover)),
                                             child: Align(

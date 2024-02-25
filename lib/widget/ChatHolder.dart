@@ -1,13 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:chat_app_with_myysql/model/one_to_one_chat_model.dart';
 import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:swipe_to/swipe_to.dart';
 import 'package:video_player/video_player.dart';
-import '../model/ChatModel.dart';
 import 'myText.dart';
 
 // ignore: camel_case_types
@@ -59,9 +57,9 @@ class _chatHolderState extends State<chatHolder> {
     });
 
     ///Video player controller initalize
-    if (widget.messageModel.mediaType == "video") {
+    if (widget.messageModel.media!.type == "video") {
       _controller =
-          VideoPlayerController.networkUrl(Uri.parse(widget.messageModel.url))
+          VideoPlayerController.networkUrl(Uri.parse(widget.messageModel.media!.url!))
             ..initialize().then((_) {
               // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
               setState(() {});
@@ -93,12 +91,11 @@ class _chatHolderState extends State<chatHolder> {
 
   @override
   Widget build(BuildContext context) {
-    print("date is: ${widget.messageModel.time}");
-    return widget.messageModel.mediaType == "none"
+    return widget.messageModel.media!.type == "none"
         ? textWidget()
-        : widget.messageModel.mediaType == "audio"
+        : widget.messageModel.media!.type== "audio"
             ? audioWidget()
-            : widget.messageModel.mediaType == "video"
+            : widget.messageModel.media!.type == "video"
                 ? videoWidget()
                 : imageWidget();
   }
@@ -119,7 +116,7 @@ class _chatHolderState extends State<chatHolder> {
               children: [
                 Container(
                   child: myText(
-                    text: widget.messageModel.content,
+                    text: widget.messageModel.content??"",
                     size: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -155,7 +152,7 @@ class _chatHolderState extends State<chatHolder> {
                         MaterialPageRoute(
                           builder: (childContext) => Scaffold(
                             body: PhotoView(
-                              imageProvider: NetworkImage(widget.messageModel.url),
+                              imageProvider: NetworkImage(widget.messageModel.media!.url!),
                             ),
                           ),
                         ),
@@ -165,7 +162,7 @@ class _chatHolderState extends State<chatHolder> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Image.network(
-                            widget.messageModel.url,
+                            widget.messageModel.media!.url!,
                             fit: BoxFit.fill,
                             height: 350,
                             width: 250,
@@ -200,7 +197,7 @@ class _chatHolderState extends State<chatHolder> {
                     if (isPlaying) {
                       await audioPlayer.pause();
                     } else {
-                      await audioPlayer.play(UrlSource(widget.messageModel.url));
+                      await audioPlayer.play(UrlSource(widget.messageModel.media!.url!));
                     }
                   },
                   icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
@@ -234,9 +231,13 @@ class _chatHolderState extends State<chatHolder> {
 
   Widget buildDate() {
     return myText(
-      text: DateTimeManager.getFormattedDateTime(widget.messageModel.time,
-          format: DateTimeManager.timeFormat3,
-          format2: DateTimeManager.dateTimeFormat),
+      text: DateTimeManager
+          .getFormattedDateTimeFromDateTime(
+        DateTime.parse(
+            widget.messageModel!.createdAt??"2024-02-25T19:21:11.597Z"),
+        isutc: true,
+        format: DateTimeManager.timeFormat3,
+      ),
       size: 11,
       color: Colors.black38,
     );

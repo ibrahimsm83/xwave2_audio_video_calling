@@ -51,7 +51,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  List<Widget> screens=[Messages(),Group(),Chanels(),CallHistoryScreen()];
+  List<Widget> screens=[Messages(),Group(),CallHistoryScreen()];
+  // List<Widget> screens=[Messages(),Group(),Chanels(),CallHistoryScreen()];
 
   int selected=0;
   Widget bottom_nav(){
@@ -67,7 +68,7 @@ class _HomeState extends State<Home> {
         items: [
       BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/Group 368 (1).png'),size: 50,),label: ''),
       BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/Group 366.png'),size: 50,),label: ''),
-      BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/Group 469.png'),size: 50,),label: ''),
+      // BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/Group 469.png'),size: 50,),label: ''),
       BottomNavigationBarItem(icon: ImageIcon(AssetImage('images/Group 367.png'),size: 50,),label: ''),
     ]);
   }

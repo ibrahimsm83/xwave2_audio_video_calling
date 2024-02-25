@@ -1,11 +1,14 @@
-
 import 'dart:convert';
 import 'dart:io';
-import 'package:chat_app_with_myysql/model/ChatModel.dart';
+
+// import 'package:chat_app_with_myysql/model/ChatModel.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
+import 'package:chat_app_with_myysql/model/one_to_one_chat_model.dart';
+import 'package:chat_app_with_myysql/service/network.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
+import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:chat_app_with_myysql/util/datetime.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:flutter/material.dart';
@@ -24,16 +27,18 @@ class ChatController extends GetxController {
   RxList<ChatModel> chatList = <ChatModel>[].obs;
 
   ///Sender User
-  final Rx<User_model> _senderUser =
-      User_model(id: "", phoneNumber: "", avatar: "", username: "",infoAbout: "").obs;
+  final Rx<User_model> _senderUser = User_model(
+          id: "", phoneNumber: "", avatar: "", username: "", infoAbout: "")
+      .obs;
 
   set senderUser(User_model senderUser) => _senderUser.value = senderUser;
 
   User_model get senderUser => _senderUser.value;
 
   ///Receiver User
-  final Rx<User_model> _receiverUser =
-      User_model(id: "", phoneNumber: "", avatar: "", username: "",infoAbout: "").obs;
+  final Rx<User_model> _receiverUser = User_model(
+          id: "", phoneNumber: "", avatar: "", username: "", infoAbout: "")
+      .obs;
 
   set receiverUser(User_model receiverUser) =>
       _receiverUser.value = receiverUser;
@@ -54,66 +59,77 @@ class ChatController extends GetxController {
     print(response.body);
     EasyLoading.dismiss();
     if (response.statusCode == 200) {
-      var map=jsonDecode(response.body);
+      var map = jsonDecode(response.body);
       List<dynamic> list = map;
-
-      list.forEach((element) {
-        String contant = '';
-        String mediaType = '';
-        String url = '';
-        String lati = '',
-            longi = '';
-        String time = '';
-
-        User_model sender = User_model.fromJson(element['sender']);
-        User_model receiver = User_model.fromJson(element['receiver']);
-
-        time = element['createdAt'];
-
-        if (element['location'] != null) {
-          lati = element['location']['latitude'].toString();
-          longi = element['location']['longitude'].toString();
-        }
-
-        if (element['content'] != null) {
-          contant = element['content'];
-        }
-        mediaType = element['media']['type'];
-        if (element['media']['url'] != null) {
-          url = element['media']['url'];
-        }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
-                format: DateTimeManager.dateTimeFormat,
-                format2: DateTimeManager.dateTimeFormat24_2),
-            sender: sender,
-            receiver: receiver));
-      });
+      print("-------------chat list-----33--$map");
+      for (int i = 0; i < list.length; i++) {
+        chatList.add(ChatModel.fromJson(list[i]));
+      }
+      print("-------------chat list-----33--$chatList");
+      // list.forEach((element) {
+      //   String contant = '';
+      //   String mediaType = '';
+      //   String url = '';
+      //   String lati = '',
+      //       longi = '';
+      //   String time = '';
+      //
+      //   User_model sender = User_model.fromJson(element['sender']);
+      //   User_model receiver = User_model.fromJson(element['receiver']);
+      //
+      //   time = element['createdAt'];
+      //
+      //   if (element['location'] != null) {
+      //     lati = element['location']['latitude'].toString();
+      //     longi = element['location']['longitude'].toString();
+      //   }
+      //
+      //   if (element['content'] != null) {
+      //     contant = element['content'];
+      //   }
+      //   mediaType = element['media']['type'];
+      //   if (element['media']['url'] != null) {
+      //     url = element['media']['url'];
+      //   }
+      //   chatList.add(ChatModel(
+      //       content: contant,
+      //       mediaType: mediaType,
+      //       url: url,
+      //       lati: lati,
+      //       longi: longi,
+      //       time:DateTimeManager.getFormattedDateTime(time,isutc: true,
+      //           format: DateTimeManager.dateTimeFormat,
+      //           format2: DateTimeManager.dateTimeFormat24_2),
+      //       sender: sender,
+      //       receiver: receiver));
+      // });
 
       scrolList(scrollController);
     }
   }
 
   sendTextMSg(String receiverId, User_model senderM, User_model receiverM,
-      {bool isImage = false, bool isVoice = false, String? voiceFile, bool isVideo = false, String? videoPath}) async {
+      {bool isImage = false,
+      bool isVoice = false,
+      String? voiceFile,
+      bool isVideo = false,
+      String? videoPath}) async {
+    final String token = await getToken_praf();
+    const String url = AppConfig.DIRECTORY + "user/sendmesseges";
+    print("getApiContacts url: $url");
+
+
     if (isImage == true) {
-      final imageFile = await ImagePicker().pickImage(
-          source: ImageSource.gallery);
+      final imageFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (imageFile != null) {
         // isLoading.value = true;
-        String fileName = imageFile.path
-            .split('/')
-            .last;
+        String fileName = imageFile.path.split('/').last;
         Map<String, String> map = {
           'receiver': receiverId, //:widget.receiver.id,
           'content': messageController.text,
           'mediaType': 'image',
-         // 'media': MultipartFile(File(imageFile.path), filename: fileName),
+          // 'media': MultipartFile(File(imageFile.path), filename: fileName),
         };
         print("---map--------$map");
         print("---imageFile.path--------${imageFile.path}");
@@ -131,57 +147,46 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         isLoading.value = true;
         var response = await apiService
             .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map,
-            files: [
-              await http.MultipartFile.fromPath("media", imageFile.path,filename: fileName),
+                files: [
+              await http.MultipartFile.fromPath("media", imageFile.path,
+                  filename: fileName),
             ]);
         isLoading.value = false;
-        print("-------response------- ${response.statusCode}");
         if (response.statusCode != 200) return;
-
         messageController.clear();
-        // {message: {_id: 65a8f0d47167cd6905ca637a, content: ty,
-        // media: {type: none}, location: {},
-        // sender: {_id: 65a2d97b556f1776a25a4d4f, username: n10, avatar: https://i.stack.imgur.com/34AD2.jpg},
-        //  chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
-        //  isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
-
-        String contant = '';
-        String mediaType = '';
-        String url = '';
-        String lati = '',
-            longi = '';
-        String time = '';
         Stream stream = response.stream.transform(const Utf8Decoder());
         String body = await stream.first;
-        print("chat response is: $body");
-        var map1=jsonDecode(body);
-        time = map1['message']['chat']['updatedAt'];
-        if (map1['message']['location'] != null) {
-          if (map1['message']['location']['latitude'] != null) {
-            lati = map1['message']['location']['latitude'].toString();
-            longi =
-                map1['message']['location']['longitude'].toString();
-          }
-        }
-        if (map1['message']['content'] != null) {
-          contant = map1['message']['content'];
-        }
-        mediaType = map1['message']['media']['type'];
-        print("----Media type-----${mediaType}");
-        if (map1['message']['media']['url'] != null) {
-          url = map1['message']['media']['url'];
-        }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
-                format: DateTimeManager.dateTimeFormat,
-                format2: DateTimeManager.dateTimeFormat24_2),
-            sender: senderUser,
-            receiver: receiverUser));
+        var map1 = jsonDecode(body);
+          chatList.add(ChatModel.fromJson(map1['message']));
+        // }
+
+        // time = map1['message']['chat']['updatedAt'];
+        // if (map1['message']['location'] != null) {
+        //   if (map1['message']['location']['latitude'] != null) {
+        //     lati = map1['message']['location']['latitude'].toString();
+        //     longi = map1['message']['location']['longitude'].toString();
+        //   }
+        // }
+        // if (map1['message']['content'] != null) {
+        //   contant = map1['message']['content'];
+        // }
+        // mediaType = map1['message']['media']['type'];
+        // print("----Media type-----${mediaType}");
+        // if (map1['message']['media']['url'] != null) {
+        //   url = map1['message']['media']['url'];
+        // }
+        // chatList.add(ChatModel(
+        //     content: contant,
+        //     mediaType: mediaType,
+        //     url: url,
+        //     lati: lati,
+        //     longi: longi,
+        //     time: DateTimeManager.getFormattedDateTime(time,
+        //         isutc: true,
+        //         format: DateTimeManager.dateTimeFormat,
+        //         format2: DateTimeManager.dateTimeFormat24_2),
+        //     sender: senderUser,
+        //     receiver: receiverUser));
         scrolList(scrollController);
       }
     }
@@ -196,9 +201,7 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         // //await uploadFiles('/storage/emulated/0/Download/file_example_MP3_2MG.mp3',receiverId);
         // // //storage/emulated/0/Download/big_buck_bunny_720p_1mb.mp4
         //  return;
-        String fileName = voiceFile
-            .split('/')
-            .last;
+        String fileName = voiceFile.split('/').last;
         Map<String, String> map = {
           'receiver': receiverId,
           //:widget.receiver.id,
@@ -206,20 +209,22 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
           'mediaType': 'audio',
           //'media': MultipartFile(File('/storage/emulated/0/Download/file_example_MP3_2MG.mp3'),filename: 'sampleFile',contentType: 'multipart/form-data'),
           // 'media': MultipartFile(File('/storage/emulated/0/Download/file_example_WAV_2MG.wav'),filename: fileName),
-         // 'media': MultipartFile(File(voiceFile), filename: fileName),
+          // 'media': MultipartFile(File(voiceFile), filename: fileName),
         };
         print("---map--------${map}");
         print("---imageFile.path--------${voiceFile}");
         print("---fileName--------$fileName");
         print("---File(imageFile.path)--------${File(voiceFile)}");
-        print("---File(imageFile.path)--------${MultipartFile(
-            File(voiceFile), filename: fileName)}");
+        print(
+            "---File(imageFile.path)--------${MultipartFile(File(voiceFile), filename: fileName)}");
 
         isLoading.value = true;
         var response = await apiService
-            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map,files: [
-          await http.MultipartFile.fromPath("media", voiceFile,filename: fileName),
-        ]);
+            .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map,
+                files: [
+              await http.MultipartFile.fromPath("media", voiceFile,
+                  filename: fileName),
+            ]);
         isLoading.value = false;
         print("-------dddd-------");
         if (response.statusCode != 200) return;
@@ -231,43 +236,43 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
         //  chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
         //  isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
 
-        String contant = '';
-        String mediaType = '';
-        String url = '';
-        String lati = '',
-            longi = '';
-        String time = '';
+        // String contant = '';
+        // String mediaType = '';
+        // String url = '';
+        // String lati = '', longi = '';
+        // String time = '';
         Stream stream = response.stream.transform(const Utf8Decoder());
         String body = await stream.first;
-        var map1=jsonDecode(body);
-        time = map1['message']['chat']['updatedAt'];
-        if (map1['message']['location'] != null) {
-          if (map1['message']['location']['latitude'] != null) {
-            lati = map1['message']['location']['latitude'].toString();
-            longi =
-                map1['message']['location']['longitude'].toString();
-          }
-        }
-        if (map1['message']['content'] != null) {
-          contant = map1['message']['content'];
-        }
-        mediaType = map1['message']['media']['type'];
-        print("----Media type-----${mediaType}");
-
-        if (map1['message']['media']['url'] != null) {
-          url = map1['message']['media']['url'];
-        }
-        chatList.add(ChatModel(
-            content: contant,
-            mediaType: mediaType,
-            url: url,
-            lati: lati,
-            longi: longi,
-            time:DateTimeManager.getFormattedDateTime(time,isutc: true,
-                format: DateTimeManager.dateTimeFormat,
-                format2: DateTimeManager.dateTimeFormat24_2),
-            sender: senderUser,
-            receiver: receiverUser));
+        var map1 = jsonDecode(body);
+        chatList.add(ChatModel.fromJson(map1['message']));
+        // time = map1['message']['chat']['updatedAt'];
+        // if (map1['message']['location'] != null) {
+        //   if (map1['message']['location']['latitude'] != null) {
+        //     lati = map1['message']['location']['latitude'].toString();
+        //     longi = map1['message']['location']['longitude'].toString();
+        //   }
+        // }
+        // if (map1['message']['content'] != null) {
+        //   contant = map1['message']['content'];
+        // }
+        // mediaType = map1['message']['media']['type'];
+        // print("----Media type-----${mediaType}");
+        //
+        // if (map1['message']['media']['url'] != null) {
+        //   url = map1['message']['media']['url'];
+        // }
+        // chatList.add(ChatModel(
+        //     content: contant,
+        //     mediaType: mediaType,
+        //     url: url,
+        //     lati: lati,
+        //     longi: longi,
+        //     time: DateTimeManager.getFormattedDateTime(time,
+        //         isutc: true,
+        //         format: DateTimeManager.dateTimeFormat,
+        //         format2: DateTimeManager.dateTimeFormat24_2),
+        //     sender: senderUser,
+        //     receiver: receiverUser));
         print("-------------");
         print(chatList);
         scrolList(scrollController);
@@ -349,118 +354,33 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
      */
     }
 
-
     if (messageController.text.isEmpty) return;
-    Map<String, String> map = {
-      'receiver': receiverId, //:widget.receiver.id,
-      'content': messageController.text,
-    };
+    final String body = jsonEncode({"content": messageController.text,
+      "receiver":receiverId,
+    });
     isLoading.value = true;
-    var response = await apiService
-        .postApiWithFromDataAndHeaderAndContantType(send1To1Msg, map);
-    isLoading.value = false;
-
-    if (response.statusCode != 200) return;
-
+    await Network().post(url, body,headers: {
+      "Authorization": "Bearer ${token}",
+      'Content-type': 'application/json'
+    }, onSuccess: (val) {
+      print("one to one chat  response--1: ${val}");
+      var map = jsonDecode(val);
+      print("one to one  response--2: ${val}");
+      chatList.add(ChatModel.fromJson(map['message']));
+    },
+        onError: (e){
+          print('Failed to load data: ${e}');
+        }
+    );
     messageController.clear();
-    // {message: {_id: 65a8f0d47167cd6905ca637a, content: ty,
-    // media: {type: none}, location: {},
-    // sender: {_id: 65a2d97b556f1776a25a4d4f, username: n10, avatar: https://i.stack.imgur.com/34AD2.jpg},
-    // chat: {_id: 65a65648ffdcd322af8fd0fd, users: [{_id: 65a2d97b556f1776a25a4d4f, phoneNumber: +9210, username: n10}, {_id: 65a65609ffdcd322af8fd0f1, phoneNumber: +92100, username: n100}],
-    // isGroupChat: false, createdAt: 1/18/2024, 2:35:16 PM, updatedAt: 1/18/2024, 2:35:16 PM}}}
-    String contant = '';
-    String mediaType = '';
-    String url = '';
-    String lati = '',
-        longi = '';
-    String time = '';
-    Stream stream = response.stream.transform(const Utf8Decoder());
-    String body = await stream.first;
-    var map1=jsonDecode(body);
-    time = map1['message']['chat']['updatedAt'];
-    if (map1['message']['location'] != null) {
-      if (map1['message']['location']['latitude'] != null) {
-        lati = map1['message']['location']['latitude'].toString();
-        longi = map1['message']['location']['longitude'].toString();
-      }
-    }
-    if (map1['message']['content'] != null) {
-      contant = map1['message']['content'];
-    }
-    mediaType = map1['message']['media']['type'];
-    if (map1['message']['media']['url'] != null) {
-      url = map1['message']['media']['url'];
-    }
-    chatList.add(ChatModel(
-        content: contant,
-        mediaType: mediaType,
-        url: url,
-        lati: lati,
-        longi: longi,
-        time:DateTimeManager.getFormattedDateTime(time,isutc: true,
-            format: DateTimeManager.dateTimeFormat,
-            format2: DateTimeManager.dateTimeFormat24_2),
-        sender: senderUser,
-        receiver: receiverUser));
+    isLoading.value = false;
     scrolList(scrollController);
   }
 
   msgListner(dynamic newMessage) async {
     print('msg - ' + newMessage.toString());
-
-    String contant = '';
-    String mediaType = '';
-    String url = '';
-    String lati = '',
-        longi = '';
-    String time = '';
-    String senderId = '';
-    String receiverId = '';
-
-    time = newMessage['createdAt'];
-
-    if (newMessage['receiver'] != null) {
-      receiverId = newMessage['receiver'];
-    }
-    if (newMessage['sender'] != null) {
-      senderId = newMessage['sender'];
-    }
-
-    if (newMessage['location'] != null) {
-      if (newMessage['location']['latitude'] != null) {
-        lati = newMessage['location']['latitude'].toString();
-        longi = newMessage['location']['longitude'].toString();
-      }
-    }
-
-    if (newMessage['content'] != null) {
-      contant = newMessage['content'];
-    }
-    mediaType = newMessage['media']['type'];
-    if (newMessage['media']['url'] != null) {
-      url = newMessage['media']['url'];
-    }
-    print("listener is running -----");
-    // chatList.add(ChatModel(content: contant, mediaType: mediaType, url: url, lati: lati, longi: longi, time: time, sender:senderUser , receiver: receiverUser));
-    chatList.add(ChatModel(
-        content: contant,
-        mediaType: mediaType,
-        url: url,
-        lati: lati,
-        longi: longi,
-        //time: time,
-        time:DateTimeManager.getFormattedDateTime(time,isutc: true,
-            format: DateTimeManager.dateTimeFormat,
-            format2: DateTimeManager.dateTimeFormat24_2),
-        sender:
-        User_model(id: senderId, phoneNumber: '', avatar: '', username: '',infoAbout: ""),
-        receiver: User_model(
-            id: receiverId, phoneNumber: '', avatar: '', username: '',infoAbout: "")));
-
+    chatList.add(ChatModel.fromJson(newMessage['message']));
     print("lisntneeeeeeee");
-    print(senderUser.id);
-    print(receiverUser.id);
-
     scrolList(scrollController);
   }
 
@@ -477,13 +397,13 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://xwavetechnologies.com/user/sendmesseges'));
-    request.fields.addAll(
-        {
-          'receiver': recid ?? '65789d8171514a281b248cbd',
-          'content': '',
-          'mediaType': 'video',
-        });
-    request.files.add(await http.MultipartFile.fromPath('media',
+    request.fields.addAll({
+      'receiver': recid ?? '65789d8171514a281b248cbd',
+      'content': '',
+      'mediaType': 'video',
+    });
+    request.files.add(await http.MultipartFile.fromPath(
+      'media',
       //'/Users/apple/Downloads/ast01.dev.itpvoice.net-1704835631.25357.mp3'
       filePath,
     ));
@@ -494,53 +414,53 @@ E/flutter (17085): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled 
       dynamic data = jsonDecode(await response.stream.bytesToString());
       // String responseBody = await utf8.decode(response.bodyBytes);
       print("---------my chat response------2-----");
-       print(data['message']);
-      print(data['message']['media']['type']);
-       print(data['message']['media']['url']);
-
-          //print(apiRes);
-
-
+      print(data['message']);
+      chatList.add(ChatModel.fromJson(data['message']));
+      // print(data['message']['media']['type']);
+      // print(data['message']['media']['url']);
       //
-      String contant = '';
-      String mediaType = '';
-      String url = '';
-      String lati = '', longi = '';
-      String time = '';
-      time = data['message']['chat']['updatedAt'];
-      if (data['message']['location'] != null) {
-        if (data['message']['location']['latitude'] != null) {
-          lati = data['message']['location']['latitude'].toString();
-          longi = data['message']['location']['longitude'].toString();
-        }
-      }
-      if (data['message']['content'] != null) {
-        contant = data['message']['content'];
-      }
-      mediaType = data['message']['media']['type'];
-      print("----Media type-----${mediaType}");
-      print(data['message']['media']['type']);
-
-      if (data['message']['media']['url'] != null) {
-        url = data['message']['media']['url'];
-      }
-      chatList.add(ChatModel(
-          content: contant,
-          mediaType: mediaType,
-          url: url,
-          lati: lati,
-          longi: longi,
-         // time: time,
-          time: DateTimeManager.getFormattedDateTime(time,isutc: true,
-              format: DateTimeManager.dateTimeFormat,
-              format2: DateTimeManager.dateTimeFormat24_2),
-          sender: senderUser,
-          receiver: receiverUser));
+      // //print(apiRes);
+      //
+      // //
+      // String contant = '';
+      // String mediaType = '';
+      // String url = '';
+      // String lati = '', longi = '';
+      // String time = '';
+      // time = data['message']['chat']['updatedAt'];
+      // if (data['message']['location'] != null) {
+      //   if (data['message']['location']['latitude'] != null) {
+      //     lati = data['message']['location']['latitude'].toString();
+      //     longi = data['message']['location']['longitude'].toString();
+      //   }
+      // }
+      // if (data['message']['content'] != null) {
+      //   contant = data['message']['content'];
+      // }
+      // mediaType = data['message']['media']['type'];
+      // print("----Media type-----${mediaType}");
+      // print(data['message']['media']['type']);
+      //
+      // if (data['message']['media']['url'] != null) {
+      //   url = data['message']['media']['url'];
+      // }
+      // chatList.add(ChatModel(
+      //     content: contant,
+      //     mediaType: mediaType,
+      //     url: url,
+      //     lati: lati,
+      //     longi: longi,
+      //     // time: time,
+      //     time: DateTimeManager.getFormattedDateTime(time,
+      //         isutc: true,
+      //         format: DateTimeManager.dateTimeFormat,
+      //         format2: DateTimeManager.dateTimeFormat24_2),
+      //     sender: senderUser,
+      //     receiver: receiverUser));
       print("-------------");
       print(chatList);
       scrolList(scrollController);
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       print(response.statusCode);
       print(await response.stream.bytesToString());
