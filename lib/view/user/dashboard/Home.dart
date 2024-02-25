@@ -3,7 +3,7 @@
 import 'package:chat_app_with_myysql/controller/user/contact_controller.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart';
-import 'package:chat_app_with_myysql/widget/bottom_nav/Calls.dart';
+import 'package:chat_app_with_myysql/view/user/dashboard/call/call_history.dart';
 import 'package:chat_app_with_myysql/widget/bottom_nav/Chanels.dart';
 import 'package:chat_app_with_myysql/widget/bottom_nav/Group.dart';
 import 'package:chat_app_with_myysql/widget/bottom_nav/Messages.dart';
@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  List<Widget> screens=[Messages(),Group(),Chanels(),Calls()];
+  List<Widget> screens=[Messages(),Group(),Chanels(),CallHistoryScreen()];
 
   int selected=0;
   Widget bottom_nav(){

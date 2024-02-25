@@ -9,6 +9,7 @@ class AppDimen{
   static const double DASHBOARD_APPBAR_HEIGHT=LOGIN_APPBAR_HEIGHT;
 
   static const double APPBAR_ICON_SIZE = 20;
+  static const double BACK_ICON_SIZE = 14;
   static const double APPBAR_ICON_BUTTON_SIZE=36;
   static const double ICON_MENU_SIZE=18;
 

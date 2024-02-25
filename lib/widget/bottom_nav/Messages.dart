@@ -20,6 +20,7 @@ import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart'
 import 'package:chat_app_with_myysql/view/user/dashboard/Contacts.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/OneToOneChat.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/one_to_one_chat/controller.dart';
+import 'package:chat_app_with_myysql/view/user/dashboard/settings/profile/my_profile.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/settings/settings.dart';
 import 'package:chat_app_with_myysql/widget/my_profile_container.dart';
 import 'package:flutter/cupertino.dart';
@@ -270,7 +271,8 @@ class _MessagesState extends State<Messages> {
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
               onTap: () {
-                AppNavigator.navigateTo(SettingsScreen());
+              //  AppNavigator.navigateTo(SettingsScreen());
+                AppNavigator.navigateTo(MyProfileScreen());
               },
               child: my_profile_container(
                   img: dashboardController.user_model == null
@@ -410,9 +412,6 @@ class _MessagesState extends State<Messages> {
   Widget flottingBtn() {
     return FloatingActionButton(
       onPressed: () async {
-        await Permission.contacts.request();
-        bool b = await Permission.contacts.isGranted;
-        if (b) next_page(Contacts());
         AppNavigator.navigateTo(Contacts());
       },
       backgroundColor: appYellow,

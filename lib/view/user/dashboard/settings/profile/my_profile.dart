@@ -1,3 +1,4 @@
+import 'package:chat_app_with_myysql/resources/asset_path.dart';
 import 'package:chat_app_with_myysql/resources/dimen.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
@@ -7,6 +8,8 @@ import 'package:chat_app_with_myysql/view/user/dashboard/settings/profile/edit_p
 import 'package:chat_app_with_myysql/widget/app_bar.dart';
 import 'package:chat_app_with_myysql/widget/background.dart';
 import 'package:chat_app_with_myysql/widget/common.dart';
+import 'package:chat_app_with_myysql/widget/icons.dart';
+import 'package:chat_app_with_myysql/widget/myBtn.dart';
 import 'package:chat_app_with_myysql/widget/myText.dart';
 import 'package:chat_app_with_myysql/widget/profile_items.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +31,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final double spacing=AppSizer.getHeight(15);
     return CustomBackground(
         child: Scaffold(
-      appBar: DashboardAppbar(),
+      appBar: DashboardAppbar(leading: ButtonBack(onTap: (){
+        AppNavigator.pop();
+      },),action: CustomIconButton(icon: CustomMonoIcon(
+        icon: AssetPath.ICON_LOGOUT,color: AppColor.appYellow,
+        size: AppSizer.getHeight(AppDimen.APPBAR_ICON_SIZE),
+      ),onTap: (){
+        dashboardController.logout();
+      },),),
       backgroundColor: AppColor.colorTransparent,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/interface.dart';
+import 'package:chat_app_with_myysql/model/page_model.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
 import 'package:chat_app_with_myysql/resources/asset_path.dart';
 import 'package:chat_app_with_myysql/resources/integer.dart';
@@ -19,11 +20,13 @@ import 'package:permission_handler/permission_handler.dart';
 class CallController extends GetxController implements CallEventHandler {
   static const int MAX_CALL_PARTICIPANTS = 4;
 
-  final DashboardController _dashboardController =
+  final DashboardController dashboardController =
       Get.find<DashboardController>();
 
   final CallRepository callRepository = CallRepository();
   CallService? _callService;
+
+  final Rx<PageModel<VoiceCall>> callHistory = PageModel<VoiceCall>().obs;
 
   VoiceCall? _currentCall;
 
@@ -185,7 +188,7 @@ class CallController extends GetxController implements CallEventHandler {
 
   void _dial(User_model receiver, String type) async {
     _currentCall = VoiceCall(
-      dialer: _dashboardController.user_model,
+      dialer: dashboardController.user_model,
       receiver: receiver,
       type: type,
       category: VoiceCall.CATEGORY_SINGLE,
@@ -359,4 +362,20 @@ class CallController extends GetxController implements CallEventHandler {
       }
     }
   }
+
+  void loadCallHistory() async{
+    final String token = await getToken_praf();
+    await callRepository.getCallHistory(token,
+        dashboardController.user_model!.id).then((list) {
+      if (list != null) {
+        callHistory.value=list;
+      }
+    });
+  }
+
+  void refreshList() {
+    callHistory.value = PageModel();
+    loadCallHistory();
+  }
+
 }
