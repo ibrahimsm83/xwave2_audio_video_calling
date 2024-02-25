@@ -6,7 +6,7 @@ class DateTimeManager {
   static const String dateTimeFormat24_2 = "yyyy-MM-ddTHH:mm:ssZ";
   static const String dateTimeFormat = "yyyy-MM-dd hh:mm aa"; // main keep format
 
-  // static const dateFormat="yyyy-MM-dd";
+  static const dateTimeFormat2="EEE, hh:mm aa";
 
   static const dateFormat = "MM-dd-yyyy";
 

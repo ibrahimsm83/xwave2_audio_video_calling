@@ -44,6 +44,15 @@ class User_model {
       infoAbout: "",
     );
   }
+  factory User_model.fromCallJson2(Map<String, dynamic> json) {
+    return User_model(
+      id: json["userId"] ?? '',
+      phoneNumber: "",
+      avatar: json["avatar"] ?? '',
+      username: json["username"] ?? '',
+      infoAbout: "",
+    );
+  }
 
   factory User_model.fromJson2(Map<String, dynamic> json,{String? access_token,}) {
     return User_model.empty(

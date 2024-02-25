@@ -101,9 +101,7 @@ class CustomIconButton extends StatelessWidget {
         child: Material(
             color: AppColor.colorTransparent,
             child: IconButton(
-              icon: Container(
-                  //   color: AppColor.COLOR_RED1,
-                  child: buildIcon()),
+              icon: buildIcon(),
               onPressed: onTap,
               iconSize: icon.getIconSize,
               constraints: const BoxConstraints(),
@@ -125,4 +123,19 @@ class PopupMenuButton extends CustomIconButton {
           ),
         );
 
+}
+
+
+class ButtonBack extends CustomIconButton {
+
+  ButtonBack({
+    final void Function()? onTap,
+    double? size,
+    Color color = AppColor.appYellow,
+  }) : super(
+      icon: IconBack(
+        size: size ?? AppSizer.getHeight(AppDimen.BACK_ICON_SIZE),
+        color: color,
+      ),
+      onTap: onTap);
 }

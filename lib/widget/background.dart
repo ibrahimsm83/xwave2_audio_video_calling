@@ -5,13 +5,28 @@ class CustomBackground extends StatelessWidget {
   final Widget child;
   final bool safe;
   final Color bgColor;
-  const CustomBackground({Key? key,required this.child,this.safe=true,
-    this.bgColor=AppColor.bgColor}) : super(key: key);
+  final String? bgImage;
+  const CustomBackground(
+      {Key? key,
+      required this.child,
+      this.safe = true,
+      this.bgImage,
+      this.bgColor = AppColor.bgColor})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: bgColor,
+    return Container(
       // color: AppColor.COLOR_GREY1,
-      child: SafeArea(child: child,bottom: safe,),);
+      decoration: BoxDecoration(
+          color: bgColor,
+          image: bgImage != null
+              ? DecorationImage(image: AssetImage(bgImage!))
+              : null),
+      child: SafeArea(
+        child: child,
+        bottom: safe,
+      ),
+    );
   }
 }

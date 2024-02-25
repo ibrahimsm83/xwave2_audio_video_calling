@@ -19,7 +19,8 @@ class CustomMonoIcon extends StatelessWidget implements ResizableIcon{
 
   @override
   Widget build(BuildContext context) {
-    return isSvg?SvgPicture.asset(icon,width: size,height: size,color: color,)
+    return isSvg?SvgPicture.asset(icon,width: size,height: size,color: color,
+      fit: BoxFit.contain,)
         :ImageIcon(AssetImage(icon),size: size,color: color);
   }
 
@@ -30,4 +31,9 @@ class CustomMonoIcon extends StatelessWidget implements ResizableIcon{
 class IconMoreVert extends CustomMonoIcon{
   const IconMoreVert({Key? key,double? size,Color? color,}):super(key: key,
       icon: AssetPath.ICON_MORE_VERT,size: size,color: color,isSvg: true);
+}
+
+class IconBack extends CustomMonoIcon{
+  const IconBack({Key? key,double? size,Color? color,}):super(key: key,
+      icon: AssetPath.ICON_BACK,size: size,color: color,isSvg: true);
 }
