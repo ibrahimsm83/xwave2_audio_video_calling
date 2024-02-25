@@ -5,17 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:swipe_to/swipe_to.dart';
 import 'package:video_player/video_player.dart';
 import '../model/ChatModel.dart';
 import 'myText.dart';
 
 // ignore: camel_case_types
 class chatHolder extends StatefulWidget {
-  final ChatModel model;
+  final ChatModel messageModel;
   final Color chatBoxColor;
+  // final ValueChanged<ChatModel> onSwipedMessage;
 
   const chatHolder(
-      {super.key, required this.model, required this.chatBoxColor});
+      {super.key, required this.messageModel,
+        required this.chatBoxColor,
+        // required this.onSwipedMessage,
+      });
 
   @override
   State<chatHolder> createState() => _chatHolderState();
@@ -54,9 +59,9 @@ class _chatHolderState extends State<chatHolder> {
     });
 
     ///Video player controller initalize
-    if (widget.model.mediaType == "video") {
+    if (widget.messageModel.mediaType == "video") {
       _controller =
-          VideoPlayerController.networkUrl(Uri.parse(widget.model.url))
+          VideoPlayerController.networkUrl(Uri.parse(widget.messageModel.url))
             ..initialize().then((_) {
               // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
               setState(() {});
@@ -88,12 +93,12 @@ class _chatHolderState extends State<chatHolder> {
 
   @override
   Widget build(BuildContext context) {
-    print("date is: ${widget.model.time}");
-    return widget.model.mediaType == "none"
+    print("date is: ${widget.messageModel.time}");
+    return widget.messageModel.mediaType == "none"
         ? textWidget()
-        : widget.model.mediaType == "audio"
+        : widget.messageModel.mediaType == "audio"
             ? audioWidget()
-            : widget.model.mediaType == "video"
+            : widget.messageModel.mediaType == "video"
                 ? videoWidget()
                 : imageWidget();
   }
@@ -114,7 +119,7 @@ class _chatHolderState extends State<chatHolder> {
               children: [
                 Container(
                   child: myText(
-                    text: widget.model.content,
+                    text: widget.messageModel.content,
                     size: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -150,7 +155,7 @@ class _chatHolderState extends State<chatHolder> {
                         MaterialPageRoute(
                           builder: (childContext) => Scaffold(
                             body: PhotoView(
-                              imageProvider: NetworkImage(widget.model.url),
+                              imageProvider: NetworkImage(widget.messageModel.url),
                             ),
                           ),
                         ),
@@ -160,7 +165,7 @@ class _chatHolderState extends State<chatHolder> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Image.network(
-                            widget.model.url,
+                            widget.messageModel.url,
                             fit: BoxFit.fill,
                             height: 350,
                             width: 250,
@@ -195,7 +200,7 @@ class _chatHolderState extends State<chatHolder> {
                     if (isPlaying) {
                       await audioPlayer.pause();
                     } else {
-                      await audioPlayer.play(UrlSource(widget.model.url));
+                      await audioPlayer.play(UrlSource(widget.messageModel.url));
                     }
                   },
                   icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
@@ -229,8 +234,7 @@ class _chatHolderState extends State<chatHolder> {
 
   Widget buildDate() {
     return myText(
-      //text: DateFormat('HH:mm').format(dateTime),
-      text: DateTimeManager.getFormattedDateTime(widget.model.time,
+      text: DateTimeManager.getFormattedDateTime(widget.messageModel.time,
           format: DateTimeManager.timeFormat3,
           format2: DateTimeManager.dateTimeFormat),
       size: 11,
