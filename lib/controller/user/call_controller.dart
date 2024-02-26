@@ -363,14 +363,22 @@ class CallController extends GetxController implements CallEventHandler {
     }
   }
 
+
   void loadCallHistory() async{
     final String token = await getToken_praf();
+    print("token is: ${dashboardController.user_model!.id}");
     await callRepository.getCallHistory(token,
         dashboardController.user_model!.id).then((list) {
       if (list != null) {
         callHistory.value=list;
       }
     });
+  }
+
+  void initialLoadCallHistory() async{
+    if(callHistory.value.data==null) {
+      loadCallHistory();
+    }
   }
 
   void refreshList() {

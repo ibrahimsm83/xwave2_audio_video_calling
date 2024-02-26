@@ -9,11 +9,12 @@ class VoiceCall{
 
   static const TYPE_AUDIO="audio",TYPE_VIDEO="video";
 
-  static const CATEGORY_SINGLE="Individual",CATEGORY_GROUP="group";
+  static const CATEGORY_SINGLE="Individual",CATEGORY_GROUP="Group";
 
   static const SIDE_DIALER=0,SIDE_RECEIVER=1;
 
-  static const ACTION_TYPE_ONGOING="Ongoing";
+  static const ACTION_TYPE_ONGOING="Ongoing",ACTION_TYPE_RECEIVED="Call_Received",
+  ACTION_TYPE_MISSED="Missed";
 
 
   String? id;
