@@ -53,6 +53,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               imageType: ImageType.TYPE_NETWORK,
               image: dashboardController.user_model!.avatar,
             ),
+            SizedBox(height: 20.0),
             CustomText(
               text: dashboardController.user_model!.username,
               fontsize: 18,
@@ -60,11 +61,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               fontcolor: AppColor.colorWhite,
               textAlign: TextAlign.center,
             ),
+            SizedBox(height: 20.0),
           ],),),
 
           Expanded(
               child: Container(
-
                 padding: EdgeInsets.symmetric(horizontal: AppSizer.getWidth(15),
                     vertical: AppSizer.getHeight(20)),
             decoration: BoxDecoration(

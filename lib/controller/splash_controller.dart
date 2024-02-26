@@ -1,10 +1,9 @@
 import 'package:chat_app_with_myysql/controller/auth_controller.dart';
 import 'package:chat_app_with_myysql/controller/user/controller.dart';
 import 'package:chat_app_with_myysql/resources/integer.dart';
-import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
-import 'package:chat_app_with_myysql/view/auth/Login.dart';
+import 'package:chat_app_with_myysql/view/login/login_screen.dart';
 import 'package:chat_app_with_myysql/view/story_view/story_view_controller.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Home.dart';
 import 'package:get/get.dart';

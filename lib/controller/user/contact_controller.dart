@@ -33,7 +33,7 @@ class ContactController extends GetxController {
       });
     });
 
-    AppMessage.showMessage("Contacts length: ${users.length}");
+    // AppMessage.showMessage("Contacts length: ${users.length}");
     final String token = await getToken_praf();
     await contactRepository.getApiContacts(token, map).then((list) {
       if (list != null) {

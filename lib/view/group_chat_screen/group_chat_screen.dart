@@ -188,7 +188,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
           image: widget.groupImage!,
           title: widget.title!,
           subtitle: widget.userCount),
-      backgroundColor: AppColor.appBlack,
+      //backgroundColor: AppColor.appBlack,
       resizeToAvoidBottomInset: true,
       body: Obx(
         () => Column(
@@ -218,13 +218,13 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
             ///Right
             return Align(
                 alignment: Alignment.centerRight,
-                child: GroupChatHolder(model: model, chatBoxColor: appYellow));
+                child: GroupChatHolder(model: model, chatBoxColor: appYellow,isLeft: false,));
           } else {
             ///Left
             return Align(
                 alignment: Alignment.centerLeft,
                 child:
-                    GroupChatHolder(model: model, chatBoxColor: applightWhite));
+                    GroupChatHolder(model: model, chatBoxColor: applightWhite,isLeft: true,));
           }
         },
       ),
@@ -234,8 +234,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
   Widget chatOptionsWight(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-            onPressed: () {}, icon: const Icon(Icons.emoji_emotions_outlined)),
+        // IconButton(
+        //     onPressed: () {}, icon: const Icon(Icons.emoji_emotions_outlined)),
         chatInputWight(context),
         Visibility(
           visible: !groupChatController.isLoading.value,
@@ -292,56 +292,59 @@ class _GroupChatScreenState extends State<GroupChatScreen>  with SocketMessageHa
 
   Widget chatInputWight(BuildContext context) {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.grey[200], borderRadius: BorderRadius.circular(20)),
-        child: Row(
-          children: [
-            Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey[200], borderRadius: BorderRadius.circular(20)),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: my_inputWithHint(
+                  controler: groupChatController.messageController,
+                  hint: 'Message',
+                ),
+              )),
+              InkWell(
+                onTap: () {
+                  _showPicker(context: context);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(2.0),
+                  child: Icon(Icons.attach_file),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  groupChatController.sendMessageApi(widget.groupId!,isImage: true);
+                },
                 child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: my_inputWithHint(
-                controler: groupChatController.messageController,
-                hint: 'Message',
+                  padding: const EdgeInsets.all(2.0),
+                  child: Icon(Icons.camera_alt_outlined),
+                ),
               ),
-            )),
-            InkWell(
-              onTap: () {
-                _showPicker(context: context);
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(2.0),
-                child: Icon(Icons.attach_file),
+              InkWell(
+                onTap: () {
+                  print("mic button tapped..");
+                  if (_currentStatus == RecordingStatus.Initialized) {
+                    _start();
+                    groupChatController.isMicTapped.value = true;
+                  } else if (_currentStatus == RecordingStatus.Stopped) {
+                    _init();
+                  } else {
+                    _start();
+                    groupChatController.isMicTapped.value = true;
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Icon(Icons.mic),
+                ),
               ),
-            ),
-            InkWell(
-              onTap: () {
-                groupChatController.sendMessageApi(widget.groupId!,isImage: true);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Icon(Icons.camera_alt_outlined),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                print("mic button tapped..");
-                if (_currentStatus == RecordingStatus.Initialized) {
-                  _start();
-                  groupChatController.isMicTapped.value = true;
-                } else if (_currentStatus == RecordingStatus.Stopped) {
-                  _init();
-                } else {
-                  _start();
-                  groupChatController.isMicTapped.value = true;
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Icon(Icons.mic),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -23,7 +23,7 @@ class GroupChatController extends GetxController {
         groupsChatList.value = list;
       }
       else{
-        AppMessage.showMessage("No Groups Found");
+        //AppMessage.showMessage("No Groups Found");
       }
     });
     isLoading.value=false;

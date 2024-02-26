@@ -7,6 +7,7 @@ import 'package:chat_app_with_myysql/service/network/ApiService.dart';
 import 'package:chat_app_with_myysql/service/network/SocketManager.dart';
 import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/resources/myColors.dart';
+import 'package:chat_app_with_myysql/util/export.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/Home.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/settings/profile/Info.dart';
@@ -41,35 +42,70 @@ class _VerificationState extends State<Verification> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(child: Column(children: [
-        Center(child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: myText(text: 'Phone Verification $otp',fontWeight: FontWeight.w500,size: 16,),
-        )),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          InkWell(
+            onTap: ()=>Get.back(),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(color:
+                ColorManager.kPrimaryColor,
+                shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Icon(Icons.adaptive.arrow_back,color: ColorManager.kWhiteColor,),
+                ),
+              ),
+            ),
+          ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child:Column(
+                children: [
+                  Text('Phone Verification',style: getSemiBoldStyle(color: ColorManager.kBlackColor,fontSize: 16,fontFamily: FontConstants.fontFamilyJakarta),),
+                  Text('$otp',style: getSemiBoldStyle(color: ColorManager.kBlackColor,fontSize: 13,fontFamily: FontConstants.fontFamilyJakarta),),
+                ],
+              ),
+
+            ),
+          const  SizedBox.shrink(),
+        ],),
+
         
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: myText(text: 'Enter 6 digit verification code sent to your phone number',fontWeight: FontWeight.w500,size: 15,),
+          padding: const EdgeInsets.all(15.0),
+          child:Text("Enter 6 digit verification code sent to your phone number",style: getSemiBoldStyle(color: ColorManager.kBlackColor,fontSize: 16,fontFamily: FontConstants.fontFamilyJakarta),),
+
         ),
 
-
         Padding(
-          padding: const EdgeInsets.all(18.0),
+          padding: const EdgeInsets.all(12.0),
           child: OtpTextField(
             numberOfFields: 6,
             borderColor: appYellow,
+            fieldWidth: 50,
+            enabledBorderColor: ColorManager.kBlackColor.withOpacity(0.5),
+            focusedBorderColor: ColorManager.kPrimaryColor,
+            textStyle: getBoldStyle(color: ColorManager.kBlackColor,fontSize: 16, fontFamily: FontConstants.fontFamilyJakarta),
             //set to true to show as box or false to show as dash
             showFieldAsBox: true,
             //runs when a code is typed in
             onCodeChanged: (String code) {
               //handle validation or checks here
             },
+            borderRadius:const BorderRadius.all(Radius.circular(12),),
             //runs when every textfield is filled
             onSubmit: (String verificationCode) async{
               authController.verifyUser(widget.nbr, verificationCode);
             }, // end onSubmit
           ),
         ),
-        
+        SizedBox(height: 10.0),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: InkWell(
@@ -82,7 +118,7 @@ class _VerificationState extends State<Verification> {
                   }
                 });
               },
-              child: myText(text: 'resend code',color: appYellow)),
+              child:  Text('Resend Code',style: getSemiBoldStyle(color: ColorManager.kPrimaryColor,fontSize: 16,fontFamily: FontConstants.fontFamilyJakarta),),),
         )
 
       ],)),

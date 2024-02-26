@@ -132,55 +132,91 @@ class CallHistoryContainer extends StatelessWidget {
   static const FIT_LINE = 2;
 
   final VoiceCall call;
-  final void Function()? onCallTap,onVideoTap;
+  final void Function()? onCallTap, onVideoTap;
   const CallHistoryContainer({
     super.key,
-    required this.call,this.onCallTap,this.onVideoTap,
+    required this.call,
+    this.onCallTap,
+    this.onVideoTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double iconsize=AppSizer.getHeight(22);
+    final double iconsize = AppSizer.getHeight(22);
     return Container(
       padding: EdgeInsets.symmetric(
           horizontal: AppSizer.getWidth(AppDimen.DASHBOARD_PADDING_HORZ)),
       child: Row(
         children: [
           buildPicCircle(call.getParticipants()),
-          SizedBox(width: AppSizer.getWidth(10),),
+          SizedBox(
+            width: AppSizer.getWidth(10),
+          ),
           Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: AppSizer.getHeight(25)),
-                decoration: const BoxDecoration(border: Border(bottom: BorderSide(width: 1,
-                    color: AppColor.colorGrey3))),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+            padding: EdgeInsets.symmetric(vertical: AppSizer.getHeight(25)),
+            decoration: const BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(width: 1, color: AppColor.colorGrey3))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 CustomText(
-                  text: !call.isGroup ? call.receiver!.username : "",
-                  fontsize: 18,fontweight: FontWeight.w600,
+                  text: call.getParticipants()
+                      .map((e) {
+                    return e.username;
+                  }).toList().join(", "),
+                  fontsize: 18,
+                  fontweight: FontWeight.w600,
                 ),
-                SizedBox(height: AppSizer.getHeight(4),),
+                SizedBox(
+                  height: AppSizer.getHeight(4),
+                ),
                 Row(
                   children: [
-                    CustomMonoIcon(icon: AssetPath.ICON_CALL_INCOMING,
-                        size: AppSizer.getHeight(16),isSvg: true,color: null,),
-                    SizedBox(width: AppSizer.getWidth(5),),
+                    CustomMonoIcon(
+                      icon: call.actionType == VoiceCall.ACTION_TYPE_RECEIVED
+                          ? AssetPath.ICON_CALL_INCOMING
+                          : call.actionType == VoiceCall.ACTION_TYPE_MISSED
+                              ? AssetPath.ICON_CALL_MISSED
+                              : AssetPath.ICON_CALL_OUTGOING,
+                      size: AppSizer.getHeight(16),
+                      isSvg: true,
+                      color: null,
+                    ),
+                    SizedBox(
+                      width: AppSizer.getWidth(5),
+                    ),
                     CustomText(
                       text: DateTimeManager.getFormattedDateTime(call.dateTime!,
                           format: DateTimeManager.dateTimeFormat2,
                           format2: DateTimeManager.dateTimeFormat),
-                      fontsize: 14,fontcolor: AppColor.colorGrey,
+                      fontsize: 14,
+                      fontcolor: AppColor.colorGrey,
                     ),
                   ],
                 ),
-                            ],
-                          ),
-              )),
-          CustomIconButton(icon: CustomMonoIcon(icon: AssetPath.ICON_CALL2,isSvg: true,
-            size: iconsize,color: AppColor.colorGrey4,),onTap: onCallTap,),
-
-          CustomIconButton(icon: CustomMonoIcon(icon: AssetPath.ICON_VIDEO,isSvg: true,
-            size: iconsize,color: AppColor.colorGrey4,),onTap: onVideoTap,),
+              ],
+            ),
+          )),
+          CustomIconButton(
+            icon: CustomMonoIcon(
+              icon: AssetPath.ICON_CALL2,
+              isSvg: true,
+              size: iconsize,
+              color: AppColor.colorGrey4,
+            ),
+            onTap: onCallTap,
+          ),
+          CustomIconButton(
+            icon: CustomMonoIcon(
+              icon: AssetPath.ICON_VIDEO,
+              isSvg: true,
+              size: iconsize,
+              color: AppColor.colorGrey4,
+            ),
+            onTap: onVideoTap,
+          ),
         ],
       ),
     );
@@ -196,7 +232,8 @@ class CallHistoryContainer extends StatelessWidget {
       child: ClipOval(
         child: Wrap(
           children: List.generate(participants.length, (index) {
-            return buildPicSlice(index, participants, total2, diameter, diameter);
+            return buildPicSlice(
+                index, participants, total2, diameter, diameter);
           }),
         ),
       ),
@@ -221,9 +258,12 @@ class CallHistoryContainer extends StatelessWidget {
       //  height = height / FIT_LINE;
       width = width / FIT_LINE;
     }
-    return Container(width: width,height: height,
+    return Container(
+      width: width,
+      height: height,
       child: CustomImage(
-        image: item.avatar,imageType: ImageType.TYPE_NETWORK,
+        image: item.avatar,
+        imageType: ImageType.TYPE_NETWORK,
         fit: BoxFit.cover,
       ),
     );

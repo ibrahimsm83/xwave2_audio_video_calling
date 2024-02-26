@@ -32,7 +32,7 @@ class StoryController extends GetxController {
       }
       else{
         isOwnStatus.value=false;
-        AppMessage.showMessage("No Status Found");
+       // AppMessage.showMessage("No Status Found");
       }
     });
     isLoading.value=false;
@@ -52,7 +52,7 @@ class StoryController extends GetxController {
       }
       else{
        // isOwnStatus.value=false;
-        AppMessage.showMessage("No Status Found");
+        //AppMessage.showMessage("No Status Found");
       }
     });
     isUserStatusLoading.value=false;

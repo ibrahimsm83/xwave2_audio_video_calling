@@ -5,13 +5,13 @@ import 'package:chat_app_with_myysql/model/User_model.dart';
 import 'package:chat_app_with_myysql/model/group_messages_model.dart';
 import 'package:chat_app_with_myysql/model/interface.dart';
 import 'package:chat_app_with_myysql/model/voice_call.dart';
-import 'package:chat_app_with_myysql/service/network/apis.dart';
 import 'package:chat_app_with_myysql/service/socket.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/config.dart';
 import 'package:chat_app_with_myysql/util/methods.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
-import 'package:chat_app_with_myysql/view/auth/Login.dart';
+import 'package:chat_app_with_myysql/view/login/login_screen.dart';
+
 import 'package:get/get.dart';
 
 import '../../service/network/ApiService.dart';

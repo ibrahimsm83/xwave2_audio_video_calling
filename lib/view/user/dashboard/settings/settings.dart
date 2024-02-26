@@ -4,7 +4,6 @@ import 'package:chat_app_with_myysql/controller/user/dashboard_controller.dart';
 import 'package:chat_app_with_myysql/util/MyPraf.dart';
 import 'package:chat_app_with_myysql/util/navigation.dart';
 import 'package:chat_app_with_myysql/util/sizer.dart';
-import 'package:chat_app_with_myysql/view/auth/Login.dart';
 import 'package:chat_app_with_myysql/view/user/dashboard/settings/profile/my_profile.dart';
 import 'package:chat_app_with_myysql/widget/app_bar.dart';
 import 'package:chat_app_with_myysql/widget/background.dart';
