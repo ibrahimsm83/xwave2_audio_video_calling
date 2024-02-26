@@ -64,12 +64,16 @@ dependencies:
 
   agora_rtc_engine: ^6.2.2
   agora_token_service: ^0.1.2
-
+  flutter_launcher_icons: ^0.13.1
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/appIcon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
