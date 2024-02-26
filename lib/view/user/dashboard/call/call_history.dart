@@ -22,7 +22,7 @@ class _CallHistoryScreenState extends State<CallHistoryScreen> {
 
   @override
   void initState() {
-    callController.loadCallHistory();
+    callController.initialLoadCallHistory();
     super.initState();
   }
 
